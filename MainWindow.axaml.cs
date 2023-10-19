@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 
 namespace DAGlynEditor
@@ -29,6 +30,11 @@ namespace DAGlynEditor
                 Br = Brushes.Blue
             }
         };
+
+        private void Button_OnClick(object? sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 
     public class MyRectInfo
