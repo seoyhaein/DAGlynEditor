@@ -1,7 +1,8 @@
 # DAGlynEditor
 
 ## 진행 사항
-- OverlayLayer 로 Canvas 구현하였음. 추가 기능 추가 필요 고민할 필요 있음.    
+- OverlayLayer 로 Canvas 구현하였음. 추가 기능 추가 필요 고민할 필요 있음.
+- ItemsControl 연결 해서 위치 정확히 렌더링 되는지 확인 필요.  
 - 테스트 코드 삭제 필요 및 추가 기능 구현 세부화 할 필요 있음.  
 - ViewPort 구현해야함.  
 ~~- Panning 구현 진행중 (10-18-23)~~  
