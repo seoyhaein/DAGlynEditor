@@ -33,7 +33,11 @@ namespace DAGlynEditor
 
         private void Button_OnClick(object? sender, RoutedEventArgs e)
         {
-            
+            var tester =  this.FindControl<DAGlynEditor>("EditorTester");
+            if (tester != null) 
+            {
+                tester.Offset = new Point(100, 200);   
+            }
         }
     }
 
