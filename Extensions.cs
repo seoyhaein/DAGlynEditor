@@ -85,7 +85,7 @@ namespace DAGlynEditor
         }*/
 
 
-        #region Animation
+        #region Animation 추후 살펴보자.
 
         /*public static void StartAnimation(this Control animatableElement, AvaloniaProperty property, Point toValue, double animationDurationSeconds, Action? completedAction = null)
         {
