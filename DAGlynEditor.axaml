@@ -12,7 +12,7 @@
 		<Setter Property="BorderBrush"
                 Value="DodgerBlue" />
 		<Setter Property="Background"
-                Value="Transparent" />
+                Value="Green" />
 		<Setter Property="BorderThickness"
                 Value="2"/>
 		<Setter Property="Template">
@@ -23,7 +23,7 @@
 					<ItemsPresenter Name="PART_ItemsPresenter">
 						<ItemsPresenter.ItemsPanel>
 							<ItemsPanelTemplate>
-								<controls:DAGlynEditorCanvas Offset="{TemplateBinding Offset}"/>
+								<controls:DAGlynEditorCanvas Offset="{TemplateBinding Offset}" Background="Black"/>
 							</ItemsPanelTemplate>
 						</ItemsPresenter.ItemsPanel>
 					</ItemsPresenter>
