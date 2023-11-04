@@ -15,8 +15,9 @@ namespace DAGlynEditor
     public class DAGlynEditorCanvas : OverlayLayer
     {
         #region Offset 화면이동.
+
         public static readonly StyledProperty<Point> OffsetProperty =
-           AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(Offset), default);
+            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(Offset), default);
 
         public Point Offset
         {
@@ -29,21 +30,8 @@ namespace DAGlynEditor
         public DAGlynEditorCanvas()
         {
             RenderTransform = new TranslateTransform();
-            Transitions = new Transitions
-            {
-                new PointTransition
-                {
-                    Property = OffsetProperty,
-                    Duration = TimeSpan.FromSeconds(0.5)
-                }
-            };
-
-            // 이벤트 직점 처리. Dispose 도 생각해보자.
-            PointerPressed += OnPointerPressed;
-            PointerReleased += OnPointerReleased;
-            PointerMoved += OnPointerMoved;
         }
-        
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             var child = Children;
@@ -64,6 +52,7 @@ namespace DAGlynEditor
                     }
                 }
             }
+
             return finalSize;
         }
 
@@ -73,68 +62,28 @@ namespace DAGlynEditor
             {
                 child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             }
+
             return default;
         }
-        
+
         // TODO 이거 자체에 문제가 있는 듯하다.
         // RX 를 적용해야 할듯.
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == OffsetProperty && change.NewValue is Point pointValue && RenderTransform is TranslateTransform translateTransform)
+            if (change.Property == OffsetProperty && change.NewValue is Point pointValue &&
+                RenderTransform is TranslateTransform translateTransform)
             {
                 Debug.WriteLine($"Canvas ViewPort changed to: {change.NewValue}");
                 translateTransform.X = -pointValue.X;
                 translateTransform.Y = -pointValue.Y;
             }
         }
+
         // 라우트된 이벤트로 처리하지 않고 직접 처리함.
         // sender 도 조사할 필요가 있을까?
-        private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            // 마우스 오른쪽 버튼 이벤트만 처리함.   
-            if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
-            {
-                if (e.Pointer.Captured != null) 
-                {
-                    e.Pointer.Capture(null);
-                }
-
-                e.Pointer.Capture(this);
-
-                Offset = e.GetPosition(this);
-                e.Handled = true;
-            }
-        }
-
-        private void OnPointerMoved(object? sender, PointerEventArgs e)
-        {
-            if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
-            {
-                if (e.Pointer.Captured == this)
-                {
-                    Offset = e.GetPosition(this);
-                    e.Handled = true;
-                }
-            }
-        }
-
-        private void OnPointerReleased(object? sender, PointerReleasedEventArgs e) 
-        {
-            if (e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
-            {
-                if (e.Pointer.Captured == this)
-                {
-                    Offset = e.GetPosition(this);
-                    e.Handled = true;
-
-                    e.Pointer.Capture(null);
-                }
-            }
-        }
-
-        // 추후 수정한다.Move, Release 에 배치할까? Release 에는 안해도 될 것 같지만 생각해보자. 일단 배치하자.
+        // 일단 기록을 위해서 남겨둔다. 추후 수정 또는 삭제 예정
         private void StartAnimation(Point newLocation)
         {
             if (RenderTransform == null)
@@ -156,7 +105,8 @@ namespace DAGlynEditor
             duration = Math.Max(0.1, Math.Min(duration, BringIntoViewMaxDuration));
 
             // 기존 PointTransition 찾기
-            var existingTransition = Transitions.OfType<PointTransition>().FirstOrDefault(t => t.Property == OffsetProperty);
+            var existingTransition =
+                Transitions.OfType<PointTransition>().FirstOrDefault(t => t.Property == OffsetProperty);
 
             if (existingTransition != null)
             {
@@ -174,6 +124,5 @@ namespace DAGlynEditor
                 Transitions.Add(pointTransition);
             }
         }
-
     }
 }
