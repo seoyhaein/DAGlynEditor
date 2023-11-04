@@ -12,3 +12,4 @@
 ~~- Animation 구현 (10-19-23)~~  
 - EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)      
 - Zoom 기능 추가 구현 필요.  
+- MultiGesture 기능 구현 11/4/23  

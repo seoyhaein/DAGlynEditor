@@ -23,7 +23,7 @@
 					<ItemsPresenter Name="PART_ItemsPresenter">
 						<ItemsPresenter.ItemsPanel>
 							<ItemsPanelTemplate>
-								<controls:DAGlynEditorCanvas Offset="{TemplateBinding Offset}" Background="Black"/>
+								<controls:DAGlynEditorCanvas Offset="{TemplateBinding Offset}"/>
 							</ItemsPanelTemplate>
 						</ItemsPresenter.ItemsPanel>
 					</ItemsPresenter>
