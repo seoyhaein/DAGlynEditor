@@ -13,11 +13,12 @@ namespace DAGlynEditor
             InitializeComponent();
             DataContext = this;
         }
+
         public ObservableCollection<MyRectInfo> MyItems { get; set; } = new ObservableCollection<MyRectInfo>
         {
             new MyRectInfo
             {
-                Location = new Point(10, 10),
+                Location = new Point(0, 0),
                 W = 100,
                 H = 100,
                 Br = Brushes.Red
@@ -28,15 +29,22 @@ namespace DAGlynEditor
                 W = 150,
                 H = 150,
                 Br = Brushes.Blue
+            },
+            new MyRectInfo
+            {
+                Location = new Point(-200, -200),
+                W = 150,
+                H = 150,
+                Br = Brushes.Yellow
             }
         };
 
         private void Button_OnClick(object? sender, RoutedEventArgs e)
         {
-            var tester =  this.FindControl<DAGlynEditor>("EditorTester");
-            if (tester != null) 
+            var tester = this.FindControl<DAGlynEditor>("EditorTester");
+            if (tester != null)
             {
-                tester.Offset = new Point(100, 200);   
+                tester.Offset = new Point(100, 200);
             }
         }
     }
@@ -46,6 +54,6 @@ namespace DAGlynEditor
         public Point Location { get; set; }
         public double W { get; set; }
         public double H { get; set; }
-        public IImmutableSolidColorBrush  Br { get; set; }
+        public IImmutableSolidColorBrush Br { get; set; }
     }
 }
