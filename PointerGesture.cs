@@ -7,24 +7,42 @@ namespace DAGlynEditor
     {
         private readonly KeyModifiers _keyModifiers;
         private readonly PointerUpdateKind _pointerUpdateKind;
+        private readonly int _counter = 1; // 기본값으로 1을 설정
 
-        public PointerGesture(PointerUpdateKind kind, KeyModifiers modifiers)
+        public PointerGesture(PointerUpdateKind kind)
         {
             _pointerUpdateKind = kind;
+            _keyModifiers = KeyModifiers.None;
+        }
+
+        public PointerGesture(PointerUpdateKind kind, int counter) : this(kind)
+        {
+            _counter = counter;
+        }
+
+        public PointerGesture(PointerUpdateKind kind, KeyModifiers modifiers) : this(kind)
+        {
             _keyModifiers = modifiers;
         }
 
-        public bool Match(object source, PointerEventArgs eventArgs)
+        public PointerGesture(PointerUpdateKind kind, KeyModifiers modifiers, int counter) : this(kind, modifiers)
+        {
+            _counter = counter;
+        }
+
+        public bool Matches(object source, PointerEventArgs eventArgs)
         {
             if (!(source is Visual targetElement))
                 return false;
 
-            // 현재 포인트와 이벤트 상태를 변수에 저장하여 가독성을 높이고 중복 호출을 방지합니다.
             var currentPoint = eventArgs.GetCurrentPoint(targetElement).Properties;
             bool modifiersMatch = (eventArgs.KeyModifiers & _keyModifiers) == _keyModifiers;
             bool pointerUpdateKindMatch = currentPoint.PointerUpdateKind == _pointerUpdateKind;
 
-            return modifiersMatch && pointerUpdateKindMatch;
+            bool counterMatch = eventArgs is PointerPressedEventArgs pressedEventArgs &&
+                                pressedEventArgs.ClickCount == _counter;
+
+            return modifiersMatch && pointerUpdateKindMatch && counterMatch;
         }
     }
 }

@@ -3,20 +3,23 @@ using Avalonia.Controls.Primitives;
 using Avalonia;
 using System.Diagnostics;
 using Avalonia.Input;
+using System.Collections.Generic;
 
 namespace DAGlynEditor
 {
     public class DAGlynEditor : SelectingItemsControl
     {
+        // 이것도 이름 수정해서 동일하게 작성할 예정임. 일단 동일하게 작성하고 추후 업데이트 시에 변경하는 방향으로 진행한다.
         #region Offset 화면이동.
 
         private Point _initialMousePosition;
         private Point _previousMousePosition;
         private Point _currentMousePosition;
         public static double HandleRightClickAfterPanningThreshold { get; set; } = 12d;
-
+        
+        //TODO ViewportLocation  으로 변경할 예정임. 변경후 작업 시작으로 넣어 둔다.
         public static readonly StyledProperty<Point> OffsetProperty =
-            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(Offset), default);
+            AvaloniaProperty.Register<DAGlynEditor, Point>(nameof(Offset), default);
 
         public Point Offset
         {
@@ -24,6 +27,54 @@ namespace DAGlynEditor
             set => SetValue(OffsetProperty, value);
         }
 
+        #endregion
+        
+        # region 작업시작
+        
+        // readonly
+        // MouseLocation 만들어줌. 
+        public static readonly DirectProperty<DAGlynEditor, Point> MouseLocationProperty  =
+            AvaloniaProperty.RegisterDirect<DAGlynEditor, Point>(
+                nameof(MouseLocation),
+                o => o.MouseLocation);
+
+        private Point _mouseLocation;
+
+        public Point MouseLocation
+        {
+            get => _mouseLocation; 
+            private set => SetAndRaise(MouseLocationProperty, ref _mouseLocation, value); 
+        }
+        
+        // DisablePanningProperty
+        // public static readonly DependencyProperty DisablePanningProperty = DependencyProperty.Register(nameof(DisablePanning), typeof(bool), typeof(NodifyEditor),
+        // new FrameworkPropertyMetadata(BoxValue.False, OnDisablePanningChanged))
+        public static readonly StyledProperty<bool> DisablePanningProperty =
+            AvaloniaProperty.Register<DAGlynEditor, bool>(nameof(DisablePanning), default);
+        
+        public bool DisablePanning
+        {
+            get => GetValue(DisablePanningProperty);
+            set => SetValue(DisablePanningProperty, value);
+        }
+        
+        // readonly
+        // IsPanning
+        // public static readonly DependencyPropertyKey IsPanningPropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsPanning), typeof(bool), typeof(NodifyEditor), new FrameworkPropertyMetadata(BoxValue.False));
+        // public static readonly DependencyProperty IsPanningProperty = IsPanningPropertyKey.DependencyProperty;
+        public static readonly DirectProperty<DAGlynEditor, bool> IsPanningProperty  =
+            AvaloniaProperty.RegisterDirect<DAGlynEditor, bool>(
+                nameof(IsPanning),
+                o => o.IsPanning);
+
+        private bool _isPanning;
+
+        public bool IsPanning
+        {
+            get => _isPanning; 
+            internal set => SetAndRaise(IsPanningProperty, ref _isPanning, value); 
+        }
+        
         #endregion
 
         public DAGlynEditor()
@@ -118,5 +169,55 @@ namespace DAGlynEditor
             }
             //base.OnPropertyChanged(change);
         }
+
+        // 일단 동일하게 작성함.
+        #region State Handling
+
+        private readonly Stack<EditorState> _states = new Stack<EditorState>();
+
+        /// <summary>The current state of the editor.</summary>
+        public EditorState State => _states.Peek();
+
+        /// <summary>Creates the initial state of the editor.</summary>
+        /// <returns>The initial state.</returns>
+        protected virtual EditorState GetInitialState()
+            => new EditorDefaultState(this);
+
+        /// <summary>Pushes the given state to the stack.</summary>
+        /// <param name="state">The new state of the editor.</param>
+        /// <remarks>Calls <see cref="EditorState.Enter"/> on the new state.</remarks>
+        public void PushState(EditorState state)
+        {
+            var prev = State;
+            _states.Push(state);
+            state.Enter(prev);
+        }
+
+        /// <summary>Pops the current <see cref="State"/> from the stack.</summary>
+        /// <remarks>It doesn't pop the initial state. (see <see cref="GetInitialState"/>)
+        /// <br />Calls <see cref="EditorState.Exit"/> on the current state.
+        /// <br />Calls <see cref="EditorState.ReEnter"/> on the previous state.
+        /// </remarks>
+        public void PopState()
+        {
+            // Never remove the default state
+            if (_states.Count > 1)
+            {
+                EditorState prev = _states.Pop();
+                prev.Exit();
+                State.ReEnter(prev);
+            }
+        }
+
+        /// <summary>Pops all states from the editor.</summary>
+        /// <remarks>It doesn't pop the initial state. (see <see cref="GetInitialState"/>)</remarks>
+        public void PopAllStates()
+        {
+            while (_states.Count > 1)
+            {
+                PopState();
+            }
+        }
+        #endregion
     }
 }
