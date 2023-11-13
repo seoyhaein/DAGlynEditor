@@ -157,7 +157,7 @@ namespace DAGlynEditor
         }
 
         // OnPointerPressed 관련해서 살펴본다.
-        private void OnLoaded(object sender, EventArgs e)
+        private void OnLoaded(object? sender, EventArgs e)
         {
             if (_itemsHost == null)
                 GetDAGlynEditorCanvas();
@@ -223,7 +223,7 @@ namespace DAGlynEditor
         {
             _itemsHost = this.FindControl<DAGlynEditorCanvas>("PART_ItemsHost");
         }
-
+       
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);

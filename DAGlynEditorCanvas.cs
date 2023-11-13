@@ -66,8 +66,10 @@ namespace DAGlynEditor
             return default;
         }
 
-        // TODO 이거 자체에 문제가 있는 듯하다.
+        // TODO(중요) 이거 자체에 문제가 있는 듯하다.
         // RX 를 적용해야 할듯.
+        // TODO Animation 을 추가해보는 것 생각하자. 
+        // 이 부분을 개선하는 것은 중요하다.
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
@@ -78,50 +80,6 @@ namespace DAGlynEditor
                 Debug.WriteLine($"Canvas ViewPort changed to: {change.NewValue}");
                 translateTransform.X = -pointValue.X;
                 translateTransform.Y = -pointValue.Y;
-            }
-        }
-
-        // 라우트된 이벤트로 처리하지 않고 직접 처리함.
-        // sender 도 조사할 필요가 있을까?
-        // 일단 기록을 위해서 남겨둔다. 추후 수정 또는 삭제 예정
-        private void StartAnimation(Point newLocation)
-        {
-            if (RenderTransform == null)
-            {
-                RenderTransform = new TranslateTransform();
-            }
-
-            if (Transitions == null)
-            {
-                Transitions = new Transitions();
-            }
-
-            // 임시로 일단 ViewportZoom, BringIntoViewSpeed, BringIntoViewMaxDuration 를 넣어둠.
-            double ViewportZoom = 1d;
-            double BringIntoViewSpeed = 1d;
-            double BringIntoViewMaxDuration = 1d;
-            double distance = ((Vector)(newLocation - ViewportLocation)).Length;
-            double duration = distance / (BringIntoViewSpeed + (distance / 10)) * ViewportZoom;
-            duration = Math.Max(0.1, Math.Min(duration, BringIntoViewMaxDuration));
-
-            // 기존 PointTransition 찾기
-            var existingTransition =
-                Transitions.OfType<PointTransition>().FirstOrDefault(t => t.Property == ViewportLocationProperty);
-
-            if (existingTransition != null)
-            {
-                // 이미 존재하는 PointTransition의 Duration 업데이트
-                existingTransition.Duration = TimeSpan.FromSeconds(duration);
-            }
-            else
-            {
-                // 존재하지 않으면 새로운 PointTransition 생성 및 추가
-                var pointTransition = new PointTransition
-                {
-                    Property = ViewportLocationProperty,
-                    Duration = TimeSpan.FromSeconds(duration)
-                };
-                Transitions.Add(pointTransition);
             }
         }
     }
