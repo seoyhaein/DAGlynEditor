@@ -6,16 +6,16 @@ namespace DAGlynEditor
 {
     public static class EditorGestures
     {
-        // 테스트 용으로 작성하였음. 향후 수정할 계획임.
-        /*public static PointerGesture Tester { get; set; } =
-            new PointerGesture(PointerUpdateKind.LeftButtonPressed, (KeyModifiers.Control | KeyModifiers.Alt));*/
+       // TODO: 중요. 향후 수정할 계획임. Any와 All 을 지우고 Any 로만 하는 방향으로 수정할 예정임.
 
         public static MultiGesture Select { get; } = new MultiGesture(MultiGesture.Match.Any, Selection.Append,
             Selection.Invert, Selection.Replace, Selection.Remove);
 
-        public static MultiGesture Pan { get; set; } = new MultiGesture(MultiGesture.Match.Any,
-            new PointerGesture(PointerUpdateKind.RightButtonPressed),
-            new PointerGesture(PointerUpdateKind.MiddleButtonPressed));
+        public static PointerGesture PanningStarted { get; set; } =
+               new PointerGesture(PointerUpdateKind.RightButtonPressed);
+
+        public static PointerGesture PanningEnded { get; set; } =
+                new PointerGesture(PointerUpdateKind.RightButtonReleased);
 
         /// <summary>The key modifier required to start zooming by mouse wheel.</summary>
         /// <remarks>Defaults to <see cref="ModifierKeys.None"/>.</remarks>

@@ -39,9 +39,11 @@ namespace DAGlynEditor
             bool modifiersMatch = (eventArgs.KeyModifiers & _keyModifiers) == _keyModifiers;
             bool pointerUpdateKindMatch = currentPoint.PointerUpdateKind == _pointerUpdateKind;
 
-            bool counterMatch = eventArgs is PointerPressedEventArgs pressedEventArgs &&
-                                pressedEventArgs.ClickCount == _counter;
-
+            bool counterMatch = true;
+            if (eventArgs is PointerPressedEventArgs pressedEventArgs) 
+                if (pressedEventArgs.ClickCount != _counter)
+                    counterMatch = false;
+            
             return modifiersMatch && pointerUpdateKindMatch && counterMatch;
         }
     }

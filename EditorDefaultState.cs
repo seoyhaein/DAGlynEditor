@@ -21,7 +21,7 @@ namespace DAGlynEditor
                 PushState(selecting);
             }
             // EditorGestures.Pan과 매치되고, Panning이 비활성화되지 않은 경우
-            else if (!Editor.DisablePanning && EditorGestures.Pan.Matches(e.Source, e))
+            else if (!Editor.DisablePanning && EditorGestures.PanningStarted.Matches(e.Source, e))
             {
                 PushState(new EditorPanningState(Editor));
             }

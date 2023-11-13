@@ -20,10 +20,10 @@
 				<Border Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}" >
-					<ItemsPresenter Name="PART_ItemsPresenter">
+					<ItemsPresenter x:Name="PART_ItemsPresenter">
 						<ItemsPresenter.ItemsPanel>
 							<ItemsPanelTemplate>
-								<controls:DAGlynEditorCanvas Offset="{TemplateBinding Offset}"/>
+								<controls:DAGlynEditorCanvas x:Name="PART_ItemsHost" ViewportLocation="{TemplateBinding ViewportLocation}"/>
 							</ItemsPanelTemplate>
 						</ItemsPresenter.ItemsPanel>
 					</ItemsPresenter>

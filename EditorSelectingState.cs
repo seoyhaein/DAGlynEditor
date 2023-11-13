@@ -22,30 +22,41 @@ public class EditorSelectingState : EditorState
     public override void Enter(EditorState? from)
     {
         _canceled = false;
-        Selection.Start(Editor.MouseLocation, _type);
+        // 일단 주석처리
+        //Selection.Start(Editor.MouseLocation, _type);
     }
 
     /// <inheritdoc />
     public override void Exit()
     {
-        if (_canceled)
+       // 일단 주석처리
+        /* if (_canceled)
         {
             Selection.Abort();
         }
         else
         {
             Selection.End();
-        }
+        }*/
     }
 
     /// <inheritdoc />
-    public override void HandlePointerMoved(PointerEventArgs e)
-        => Selection.Update(Editor.MouseLocation);
+
+    // 주석처리
+    /* public override void HandlePointerMoved(PointerEventArgs e)
+         => Selection.Update(Editor.MouseLocation);*/
+
+    public override void HandlePointerMoved(PointerEventArgs e) 
+    {
+        return;
+    }
 
     /// <inheritdoc />
     public override void HandlePointerPressed(PointerPressedEventArgs e)
     {
-        if (!Editor.DisablePanning && EditorGestures.Pan.Matches(e.Source, e))
+        if (e.Source == null) return;
+
+        if (!Editor.DisablePanning && EditorGestures.PanningStarted.Matches(e.Source, e))
         {
             PushState(new EditorPanningState(Editor));
         }

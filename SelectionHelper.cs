@@ -41,7 +41,7 @@ public sealed class SelectionHelper
     /// <param name="location">The location inside the graph.</param>
     /// <param name="selectionType">The type of selection.</param>
     /// <remarks>Will not do anything if selection is in progress.</remarks>
-    public void Start(Point location, SelectionType? selectionType)
+    /*public void Start(Point location, SelectionType? selectionType)
     {
         if (selectionType == null) return;
 
@@ -56,11 +56,11 @@ public sealed class SelectionHelper
             _host.SelectedArea = new Rect();
             _host.IsSelecting = true;
         }
-    }
+    }*/
 
     /// <summary>Update the end location for the selection.</summary>
     /// <param name="endLocation">An absolute location.</param>
-    public void Update(Point endLocation)
+    /*public void Update(Point endLocation)
     {
         double left = endLocation.X < _startLocation.X ? endLocation.X : _startLocation.X;
         double top = endLocation.Y < _startLocation.Y ? endLocation.Y : _startLocation.Y;
@@ -73,10 +73,10 @@ public sealed class SelectionHelper
         {
             PreviewSelection(_host.SelectedArea);
         }
-    }
+    }*/
 
     /// <summary>Commits the current selection to the editor.</summary>
-    public void End()
+   /* public void End()
     {
         if (_host.IsSelecting)
         {
@@ -86,10 +86,10 @@ public sealed class SelectionHelper
             _initialSelection.Clear();
             _host.IsSelecting = false;
         }
-    }
+    }*/
 
     /// <summary>Aborts the current selection.</summary>
-    public void Abort()
+    /*public void Abort()
     {
         if (_host.IsSelecting)
         {
@@ -97,9 +97,9 @@ public sealed class SelectionHelper
             _initialSelection.Clear();
             _host.IsSelecting = false;
         }
-    }
+    }*/
 
-    private void PreviewSelection(Rect area)
+   /* private void PreviewSelection(Rect area)
     {
         switch (_selectionType)
         {
@@ -130,9 +130,9 @@ public sealed class SelectionHelper
             default:
                 throw new ArgumentOutOfRangeException(nameof(SelectionType));
         }
-    }
+    }*/
 
-    private void PreviewUnselectAll()
+   /* private void PreviewUnselectAll()
     {
         ItemCollection items = _host.Items;
         for (var i = 0; i < items.Count; i++)
@@ -140,9 +140,9 @@ public sealed class SelectionHelper
             var container = (EditorGestures.ItemContainer)_host.ItemContainerGenerator.ContainerFromIndex(i);
             container.IsPreviewingSelection = false;
         }
-    }
+    }*/
 
-    private void PreviewSelectArea(Rect area, bool append = false, bool fit = false)
+    /*private void PreviewSelectArea(Rect area, bool append = false, bool fit = false)
     {
         if (!append)
         {
@@ -158,9 +158,9 @@ public sealed class SelectionHelper
                 container.IsPreviewingSelection = true;
             }
         }
-    }
+    }*/
 
-    private void PreviewUnselectArea(Rect area, bool fit = false)
+    /*private void PreviewUnselectArea(Rect area, bool fit = false)
     {
         ItemCollection items = _host.Items;
         for (var i = 0; i < items.Count; i++)
@@ -171,17 +171,17 @@ public sealed class SelectionHelper
                 container.IsPreviewingSelection = false;
             }
         }
-    }
+    }*/
 
-    private void PreviewSelectContainers(IList<EditorGestures.ItemContainer> containers)
+   /* private void PreviewSelectContainers(IList<EditorGestures.ItemContainer> containers)
     {
         for (var i = 0; i < containers.Count; i++)
         {
             containers[i].IsPreviewingSelection = true;
         }
-    }
+    }*/
 
-    private void PreviewInvertSelection(Rect area, bool fit = false)
+    /*private void PreviewInvertSelection(Rect area, bool fit = false)
     {
         ItemCollection items = _host.Items;
         for (var i = 0; i < items.Count; i++)
@@ -192,9 +192,9 @@ public sealed class SelectionHelper
                 container.IsPreviewingSelection = !container.IsPreviewingSelection;
             }
         }
-    }
+    }*/
 
-    private IList<EditorGestures.ItemContainer> GetSelectedContainers()
+    /*private IList<EditorGestures.ItemContainer> GetSelectedContainers()
     {
         var result = new List<EditorGestures.ItemContainer>(32);
         IList items = ((MultiSelector)_host).SelectedItems;
@@ -205,7 +205,6 @@ public sealed class SelectionHelper
         }
 
         return result;
-    }
-}
+    }*/
 
 }

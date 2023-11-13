@@ -14,15 +14,15 @@ namespace DAGlynEditor
 {
     public class DAGlynEditorCanvas : OverlayLayer
     {
-        #region Offset 화면이동.
+        #region ViewportLocation 화면이동.
 
-        public static readonly StyledProperty<Point> OffsetProperty =
-            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(Offset), default);
+        public static readonly StyledProperty<Point> ViewportLocationProperty =
+            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(ViewportLocation), default);
 
-        public Point Offset
+        public Point ViewportLocation
         {
-            get => GetValue(OffsetProperty);
-            set => SetValue(OffsetProperty, value);
+            get => GetValue(ViewportLocationProperty);
+            set => SetValue(ViewportLocationProperty, value);
         }
 
         #endregion
@@ -72,7 +72,7 @@ namespace DAGlynEditor
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == OffsetProperty && change.NewValue is Point pointValue &&
+            if (change.Property == ViewportLocationProperty && change.NewValue is Point pointValue &&
                 RenderTransform is TranslateTransform translateTransform)
             {
                 Debug.WriteLine($"Canvas ViewPort changed to: {change.NewValue}");
@@ -100,13 +100,13 @@ namespace DAGlynEditor
             double ViewportZoom = 1d;
             double BringIntoViewSpeed = 1d;
             double BringIntoViewMaxDuration = 1d;
-            double distance = ((Vector)(newLocation - Offset)).Length;
+            double distance = ((Vector)(newLocation - ViewportLocation)).Length;
             double duration = distance / (BringIntoViewSpeed + (distance / 10)) * ViewportZoom;
             duration = Math.Max(0.1, Math.Min(duration, BringIntoViewMaxDuration));
 
             // 기존 PointTransition 찾기
             var existingTransition =
-                Transitions.OfType<PointTransition>().FirstOrDefault(t => t.Property == OffsetProperty);
+                Transitions.OfType<PointTransition>().FirstOrDefault(t => t.Property == ViewportLocationProperty);
 
             if (existingTransition != null)
             {
@@ -118,7 +118,7 @@ namespace DAGlynEditor
                 // 존재하지 않으면 새로운 PointTransition 생성 및 추가
                 var pointTransition = new PointTransition
                 {
-                    Property = OffsetProperty,
+                    Property = ViewportLocationProperty,
                     Duration = TimeSpan.FromSeconds(duration)
                 };
                 Transitions.Add(pointTransition);

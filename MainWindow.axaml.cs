@@ -44,7 +44,7 @@ namespace DAGlynEditor
             var tester = this.FindControl<DAGlynEditor>("EditorTester");
             if (tester != null)
             {
-                tester.Offset = new Point(100, 200);
+                tester.ViewportLocation = new Point(100, 200);
             }
         }
     }
