@@ -163,7 +163,6 @@ namespace DAGlynEditor
                 GetDAGlynEditorCanvas();
         }
 
-
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
             // TODO 생각하기 ItemsHost가 아닌 this로 변경. this 로 잡는게 맞는지 확신이 서지않는다. 

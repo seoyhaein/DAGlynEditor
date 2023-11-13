@@ -11,9 +11,10 @@
 ~~- 마우스에 따라 Paning 기능 추가 구현 중 (10-22-23)~~    
 ~~- Animation 구현 (10-19-23)~~  
 - EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)      
-- Zoom 기능 추가 구현 필요.  
+~~- Zoom 기능 추가 구현 필요.~~    
 ~~- MultiGesture 기능 구현 11/4/23~~    
-- State 패턴 적용 및 관련 이벤트 적용, MultiGesture 기능 구현 이후. 이때 Zoom, Paning 기능 추가 및 확인. (11/7/23)  
+~~- State 패턴 적용 및 관련 이벤트 적용, MultiGesture 기능 구현 이후. 이때 Zoom, Paning 기능 추가 및 확인. (11/7/23)~~   
+- Container 구현 및 Container 에 Node 연결, 그리고, 이때 작업을 편안하게 해주는 API 구현(11/13/23)
 
 ## ViewPortLocation 변경 사항 설명
 ```
@@ -24,3 +25,4 @@
 ## 미룬 것들 (머리 안써도 되는 것들은 집중안될때 처리)
 
 1. MultiGetsture 테스트 코드 작성 (State 프로젝트 참고)
+2. Zoom 기능 추가 구현
