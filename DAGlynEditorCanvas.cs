@@ -34,9 +34,22 @@ namespace DAGlynEditor
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            var child = Children;
+            var children = Children;
 
-            if (child.Count > 0)
+            foreach (var child in children)
+            {
+                var locationProperty = child.GetType().GetProperty("Location");
+                if (locationProperty != null)
+                {
+                    var locationValue = locationProperty.GetValue(child);
+                    if (locationValue is Point location)
+                    {
+                        child.Arrange(new Rect(location, child.DesiredSize));
+                    }
+                }
+            }
+
+               /* if (child.Count > 0)
             {
                 var locationProperty = child[0].GetType().GetProperty("Location");
 
@@ -51,7 +64,7 @@ namespace DAGlynEditor
                         }
                     }
                 }
-            }
+            }*/
 
             return finalSize;
         }

@@ -203,10 +203,19 @@ namespace DAGlynEditor
         // 컨테이너 생성
         protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)
         {
-            return new MyRect();
+            if (index == 0)
+                return new MyRect();
+            else if (index == 1)
+                return new MyEllipse();
+            else 
+                return new ItemContainer();
+            
+            //return new ItemContainer();
+            //return new MyRect();
         }
 
         // 컨테이너 설정
+        // 컨테이너를 바로 Node 로 설정해주는 것도 가능할 것으로 판단된다.
         protected override void PrepareContainerForItemOverride(Control container, object? item, int index)
         {
             // 일단 임시 땜방 코드 테스트를 위해서.
@@ -216,6 +225,22 @@ namespace DAGlynEditor
                 myRect.Width = info.W;
                 myRect.Height = info.H;
                 myRect.Fill = info.Br;
+            }
+
+            if (container is ItemContainer myContainer && item is MyRectInfo info1)
+            {
+                myContainer.Location = info1.Location;
+                myContainer.Width = info1.W;
+                myContainer.Height = info1.H;
+                //myRect.Fill = info.Br;
+            }
+
+            if (container is MyEllipse myEll && item is MyRectInfo info2)
+            {
+                myEll.Location = info2.Location;
+                myEll.Width = info2.W;
+                myEll.Height = info2.H;
+                myEll.Fill = info2.Br;
             }
         }
         // TODO 시간날때 이름 생각해보자.
