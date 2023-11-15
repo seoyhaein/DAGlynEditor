@@ -203,6 +203,9 @@ namespace DAGlynEditor
         // 컨테이너 생성
         protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)
         {
+            // 아이템으로 컨테이너를 선택할 수 있도록 해야 할듯하다.
+            // 컨테이너는 직접 Node 로 만들어주는 방향으로 간다.
+            
             if (index == 0)
                 return new MyRect();
             else if (index == 1)

@@ -49,23 +49,6 @@ namespace DAGlynEditor
                 }
             }
 
-               /* if (child.Count > 0)
-            {
-                var locationProperty = child[0].GetType().GetProperty("Location");
-
-                if (locationProperty != null)
-                {
-                    foreach (var item in child)
-                    {
-                        var locationValue = locationProperty.GetValue(item);
-                        if (locationValue is Point location)
-                        {
-                            item.Arrange(new Rect(location, item.DesiredSize));
-                        }
-                    }
-                }
-            }*/
-
             return finalSize;
         }
 
