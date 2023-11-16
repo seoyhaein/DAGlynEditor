@@ -6,7 +6,10 @@
 
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="/DAGlynEditor.axaml" />
-	    <StyleInclude Source="/ItemContainer.axaml" />
+        <StyleInclude Source="/Themes/Styles/DAGlynEditor.axaml" />
+	    <StyleInclude Source="/Themes/Styles/ItemContainer.axaml" />
+		<StyleInclude Source="/Themes/Styles/Node.axaml" />
+		<StyleInclude Source="/Themes/Styles/Connector.axaml"/>
+		<StyleInclude Source="/Themes/Styles/ItemContainer.axaml"/>
     </Application.Styles>
 </Application>
