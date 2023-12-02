@@ -67,7 +67,7 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~- ViewPort 구현해야함.~~    
 ~~- Panning 구현 진행중 (10-18-23)~~  
 ~~- Paning 관련 버그 발견. 해결하지 못함. (10-24-23)~~    
-- RX 방식으로 이벤트 처리 필요  (바로 시작. 전통적인 방식하니 잘 안됨.)
+~~- RX 방식으로 이벤트 처리 필요  (바로 시작. 전통적인 방식하니 잘 안됨.)~~  
 ~~- 마우스에 따라 Paning 기능 추가 구현 중 (10-22-23)~~    
 ~~- Animation 구현 (10-19-23)~~  
 - EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)      
