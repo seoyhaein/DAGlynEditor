@@ -1,20 +1,18 @@
-﻿using Avalonia;
-using Avalonia.Animation.Easings;
-using Avalonia.Animation;
-using Avalonia.Controls;
-using Avalonia.Input;
+﻿using System;
+using Avalonia;
+using Avalonia.Reactive;
 using Avalonia.VisualTree;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAGlynEditor
 {
     public static class Extensions
     {
+        
+        public static IDisposable Subscribe<T>(this IObservable<T> observable, Action<T> action)
+        {
+            return observable.Subscribe(new AnonymousObserver<T>(action));
+        }
+        
         /* public static T? Find<T>(this Avalonia.Controls.INameScope scope, string name) where T : AvaloniaObject
          {
              if (scope.Find(name) is T result)

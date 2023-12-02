@@ -11,7 +11,6 @@ using Avalonia.Markup.Xaml.Templates;
 // 일단 주석처리 해두었다.
 using System;
 using System.Diagnostics;
-using Avalonia.Controls.Presenters;
 
 namespace DAGlynEditor
 {

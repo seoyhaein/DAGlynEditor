@@ -1,14 +1,7 @@
-﻿using System;
-using Avalonia.Controls.Primitives;
+﻿using Avalonia.Controls.Primitives;
 using Avalonia;
-using Avalonia.Animation;
 using Avalonia.Media;
 using System.Diagnostics;
-using Avalonia.Input;
-using System.ComponentModel;
-using Avalonia.Remote.Protocol.Input;
-using System.Linq;
-using Avalonia.Controls;
 
 namespace DAGlynEditor
 {

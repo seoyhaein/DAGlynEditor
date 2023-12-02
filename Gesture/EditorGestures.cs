@@ -1,6 +1,4 @@
-﻿using System;
-using Avalonia.Input;
-using Avalonia.Interactivity;
+﻿using Avalonia.Input;
 
 namespace DAGlynEditor
 {

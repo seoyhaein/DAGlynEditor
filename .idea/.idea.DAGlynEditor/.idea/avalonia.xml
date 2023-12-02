@@ -6,6 +6,7 @@
         <entry key="App.axaml" value="DAGlynEditor.csproj" />
         <entry key="DAGlynEditor.axaml" value="DAGlynEditor.csproj" />
         <entry key="MainWindow.axaml" value="DAGlynEditor.csproj" />
+        <entry key="Themes/Styles/DAGlynEditor.axaml" value="DAGlynEditor.csproj" />
         <entry key="tester.axaml" value="DAGlynEditor.csproj" />
       </map>
     </option>

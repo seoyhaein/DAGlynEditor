@@ -1,11 +1,13 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia;
-using System.Diagnostics;
 using Avalonia.Input;
-using System.Collections.Generic;
+using Avalonia.Media;
 using System;
-using Avalonia.Threading;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace DAGlynEditor
 {
@@ -13,6 +15,8 @@ namespace DAGlynEditor
     {
         public static double HandleRightClickAfterPanningThreshold { get; set; } = 12d;
         private DAGlynEditorCanvas? _itemsHost;
+
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
         #region 작업시작
 
@@ -92,7 +96,7 @@ namespace DAGlynEditor
         // DependencyProperty.Register(nameof(EnableRealtimeSelection), typeof(bool), typeof(NodifyEditor), new FrameworkPropertyMetadata(BoxValue.False));
 
         public static readonly StyledProperty<bool> EnableRealtimeSelectionProperty =
-          AvaloniaProperty.Register<DAGlynEditor, bool>(nameof(EnableRealtimeSelection), false);
+            AvaloniaProperty.Register<DAGlynEditor, bool>(nameof(EnableRealtimeSelection), false);
 
         public bool EnableRealtimeSelection
         {
@@ -104,9 +108,9 @@ namespace DAGlynEditor
         // public static readonly DependencyProperty SelectedAreaProperty = SelectedAreaPropertyKey.DependencyProperty;
 
         public static readonly DirectProperty<DAGlynEditor, Rect> SelectedAreaProperty =
-           AvaloniaProperty.RegisterDirect<DAGlynEditor, Rect>(
-               nameof(SelectedArea),
-               o => o.SelectedArea);
+            AvaloniaProperty.RegisterDirect<DAGlynEditor, Rect>(
+                nameof(SelectedArea),
+                o => o.SelectedArea);
 
         private Rect _selectedArea;
 
@@ -120,9 +124,9 @@ namespace DAGlynEditor
         // public static readonly DependencyProperty IsPreviewingSelectionProperty = IsPreviewingSelectionPropertyKey.DependencyProperty;
 
         public static readonly DirectProperty<DAGlynEditor, bool?> IsPreviewingSelectionProperty =
-          AvaloniaProperty.RegisterDirect<DAGlynEditor, bool?>(
-              nameof(IsPreviewingSelection),
-              o => o.IsPreviewingSelection);
+            AvaloniaProperty.RegisterDirect<DAGlynEditor, bool?>(
+                nameof(IsPreviewingSelection),
+                o => o.IsPreviewingSelection);
 
         private bool? _isPreviewingSelection;
 
@@ -136,68 +140,94 @@ namespace DAGlynEditor
 
         public DAGlynEditor()
         {
-            // TODO Rx 방식으로 변경 예정.
-            PointerPressed += OnPointerPressed;
-            PointerReleased += OnPointerReleased;
-            PointerMoved += OnPointerMoved;
+            InitializeSubscriptions();
             this.Loaded += OnLoaded;
 
             // state 초기화 시킴.
             _states.Push(GetInitialState());
         }
 
+        static DAGlynEditor()
+        {
+            ViewportLocationProperty.Changed.Subscribe(OnViewportLocationChanged);
+        }
+
+        private static void OnViewportLocationChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            Debug.WriteLine($"ViewPort changed to: {e.NewValue}");
+        }
+
+        private void InitializeSubscriptions()
+        {
+            Observable.FromEventPattern<PointerPressedEventArgs>(
+                    h => this.PointerPressed += h,
+                    h => this.PointerPressed -= h)
+                .Subscribe(args => HandlePointerPressed(args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PointerEventArgs>(
+                    h => this.PointerMoved += h,
+                    h => this.PointerMoved -= h)
+                .Subscribe(args => HandlePointerMoved(args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PointerReleasedEventArgs>(
+                    h => this.PointerReleased += h,
+                    h => this.PointerReleased -= h)
+                .Subscribe(args => HandlePointerReleased(args.EventArgs))
+                .DisposeWith(_disposables);
+        }
+        // 이후 더 자세히 살펴보자 by seoy
+        private void HandlePointerPressed(PointerPressedEventArgs args)
+        {
+            if (_itemsHost == null)
+                GetDAGlynEditorCanvas();
+
+            if (args.Pointer.Captured != null)
+                args.Pointer.Capture(null);
+
+            Focus();
+            args.Pointer.Capture(this);
+
+            UpdateMouseLocation(args);
+            State.HandlePointerPressed(args);
+        }
+
+        private void HandlePointerMoved(PointerEventArgs args)
+        {
+            UpdateMouseLocation(args);
+            State.HandlePointerMoved(args);
+        }
+
+        private void HandlePointerReleased(PointerReleasedEventArgs args)
+        {
+            UpdateMouseLocation(args);
+            args.Pointer.Capture(null);
+            State.HandlePointerReleased(args);
+        }
+
+        private void UpdateMouseLocation(PointerEventArgs args)
+        {
+            MouseLocation = args.GetPosition(this);
+        }
+
+        public void Dispose()
+        {
+            _disposables.Dispose();
+        }
+
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
 
-            // TODO 확인한다. 꼭. State.Enter(null);
-            // OnDisableAutoPanningChanged(DisableAutoPanning);
+            // TODO 확인한다. 꼭. State.Enter(null)
             State.Enter(null);
-
         }
-
-        // OnPointerPressed 관련해서 살펴본다.
+        
         private void OnLoaded(object? sender, EventArgs e)
         {
             if (_itemsHost == null)
                 GetDAGlynEditorCanvas();
-        }
-
-        private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            // TODO 생각하기 ItemsHost가 아닌 this로 변경. this 로 잡는게 맞는지 확신이 서지않는다. 
-            // 최종적으로 코드 최적화할때 _itemsHost 를 넣어서 하는 것 테스트 해본다.
-
-            // TODO 다른 이벤트에서도 확인해줘야 한다.
-            if (_itemsHost == null) 
-                GetDAGlynEditorCanvas();
-            
-            
-            if (e.Pointer.Captured != null)
-                e.Pointer.Capture(null);
-
-            Focus();
-            e.Pointer.Capture(this);
-            MouseLocation = e.GetPosition(this);
-            State.HandlePointerPressed(e);
-
-        }
-
-        private void OnPointerMoved(object? sender, PointerEventArgs e)
-        {
-            // TODO 생각하기 ItemsHost가 아닌 this로 변경
-            MouseLocation = e.GetPosition(this);
-            State.HandlePointerMoved(e);
-        }
-
-        private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
-        {
-            MouseLocation = e.GetPosition(this);
-            State.HandlePointerReleased(e);
-            e.Pointer.Capture(null);
-            
-            // TODO 여기서 하는것이 더 나을듯하고, 다른 이벤트 핸들러에서도 해주는 것이 나을듯하다. 일단 생각해보자.
-            // e.Handled = true;
         }
 
         // 컨테이너 생성
@@ -205,14 +235,14 @@ namespace DAGlynEditor
         {
             // 아이템으로 컨테이너를 선택할 수 있도록 해야 할듯하다.
             // 컨테이너는 직접 Node 로 만들어주는 방향으로 간다.
-            
+
             if (index == 0)
                 return new MyRect();
             else if (index == 1)
                 return new MyEllipse();
-            else 
+            else
                 return new ItemContainer();
-            
+
             //return new ItemContainer();
             //return new MyRect();
         }
@@ -235,6 +265,7 @@ namespace DAGlynEditor
                 myContainer.Location = info1.Location;
                 myContainer.Width = info1.W;
                 myContainer.Height = info1.H;
+                myContainer.Background = Brushes.Yellow;
                 //myRect.Fill = info.Br;
             }
 
@@ -246,36 +277,13 @@ namespace DAGlynEditor
                 myEll.Fill = info2.Br;
             }
         }
+
         // TODO 시간날때 이름 생각해보자.
-        private void GetDAGlynEditorCanvas() 
+        private void GetDAGlynEditorCanvas()
         {
             _itemsHost = this.FindControl<DAGlynEditorCanvas>("PART_ItemsHost");
         }
-       
-        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-        {
-            base.OnPropertyChanged(change);
-            if (change.Property == ViewportLocationProperty)
-            {
-                // 여기에서 ViewPort 속성 값의 변화를 확인할 수 있습니다.
-                Debug.WriteLine($"ViewPort changed to: {change.NewValue}");
-            }
-            else if (change.Property == DisablePanningProperty)
-            {
 
-                // var editor = (DAGlynEditor)change.Sender;
-                Debug.WriteLine($"DisablePanning changed to: {change.NewValue}");
-            }
-            //base.OnPropertyChanged(change);
-        }
-
-        /*private static void OnDisablePanningChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var editor = (NodifyEditor)d;
-            editor.OnDisableAutoPanningChanged(editor.DisableAutoPanning || editor.DisablePanning);
-        }*/
-
-        // 일단 동일하게 작성함.
         #region State Handling
 
         private readonly Stack<EditorState> _states = new Stack<EditorState>();
@@ -323,6 +331,7 @@ namespace DAGlynEditor
                 PopState();
             }
         }
+
         #endregion
     }
 }

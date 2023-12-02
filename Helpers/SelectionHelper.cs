@@ -1,7 +1,6 @@
+using Avalonia;
 using System;
 using System.Collections.Generic;
-using Avalonia;
-using Avalonia.Controls;
 
 namespace DAGlynEditor;
 

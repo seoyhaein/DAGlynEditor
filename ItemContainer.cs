@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using System.Diagnostics;
@@ -22,6 +21,7 @@ namespace DAGlynEditor
 
     // 일단 테스트 용도로 간단하게 작성한다.
     // ListBoxItem 참고한다.
+    // ContentControl pointerpressed event 적용되는지 확인 부터.
     public class ItemContainer : ContentControl, ICanvasItem
     {
 
@@ -63,7 +63,9 @@ namespace DAGlynEditor
         //TODO 이벤트가 처리 되지 않는 것은 다른데서 처리 된것 같다. 이거 파악하자.
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            RaiseContainerDragStartedEvent(e);
+            Debug.WriteLine("Called");
+            e.Handled = true;
+            //RaiseContainerDragStartedEvent(e);
         }
 
         private void OnPointerMoved(object? sender, PointerEventArgs e)

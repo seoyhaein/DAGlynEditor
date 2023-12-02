@@ -4,7 +4,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.Templates;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Avalonia.Layout;
 
 namespace DAGlynEditor
