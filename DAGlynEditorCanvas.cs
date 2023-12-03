@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls.Primitives;
 using Avalonia;
 using Avalonia.Media;
-using System.Diagnostics;
 
 namespace DAGlynEditor
 {
@@ -10,7 +9,7 @@ namespace DAGlynEditor
         #region ViewportLocation 화면이동.
 
         public static readonly StyledProperty<Point> ViewportLocationProperty =
-            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(ViewportLocation), default);
+            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(ViewportLocation), default(Point));
 
         public Point ViewportLocation
         {
@@ -23,6 +22,19 @@ namespace DAGlynEditor
         public DAGlynEditorCanvas()
         {
             RenderTransform = new TranslateTransform();
+            this.GetPropertyChangedObservable(ViewportLocationProperty).Subscribe(OnViewportLocationChanged);
+        }
+
+        private void OnViewportLocationChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is Point pointValue)
+            {
+                if (RenderTransform is TranslateTransform translateTransform)
+                {
+                    translateTransform.X = -pointValue.X;
+                    translateTransform.Y = -pointValue.Y;
+                }
+            }
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -53,23 +65,6 @@ namespace DAGlynEditor
             }
 
             return default;
-        }
-
-        // TODO(중요) 이거 자체에 문제가 있는 듯하다.
-        // RX 를 적용해야 할듯.
-        // TODO Animation 을 추가해보는 것 생각하자. 
-        // 이 부분을 개선하는 것은 중요하다.
-        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-        {
-            base.OnPropertyChanged(change);
-
-            if (change.Property == ViewportLocationProperty && change.NewValue is Point pointValue &&
-                RenderTransform is TranslateTransform translateTransform)
-            {
-                Debug.WriteLine($"Canvas ViewPort changed to: {change.NewValue}");
-                translateTransform.X = -pointValue.X;
-                translateTransform.Y = -pointValue.Y;
-            }
         }
     }
 }

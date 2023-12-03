@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive.Disposables;
@@ -14,14 +13,12 @@ namespace DAGlynEditor
     public class DAGlynEditor : SelectingItemsControl
     {
         public static double HandleRightClickAfterPanningThreshold { get; set; } = 12d;
-        private DAGlynEditorCanvas? _itemsHost;
-
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
         #region 작업시작
 
         public static readonly StyledProperty<Point> ViewportLocationProperty =
-            AvaloniaProperty.Register<DAGlynEditor, Point>(nameof(ViewportLocation), default);
+            AvaloniaProperty.Register<DAGlynEditor, Point>(nameof(ViewportLocation), default(Point));
 
         public Point ViewportLocation
         {
@@ -141,8 +138,6 @@ namespace DAGlynEditor
         public DAGlynEditor()
         {
             InitializeSubscriptions();
-            this.Loaded += OnLoaded;
-
             // state 초기화 시킴.
             _states.Push(GetInitialState());
         }
@@ -177,12 +172,10 @@ namespace DAGlynEditor
                 .Subscribe(args => HandlePointerReleased(args.EventArgs))
                 .DisposeWith(_disposables);
         }
+
         // 이후 더 자세히 살펴보자 by seoy
         private void HandlePointerPressed(PointerPressedEventArgs args)
         {
-            if (_itemsHost == null)
-                GetDAGlynEditorCanvas();
-
             if (args.Pointer.Captured != null)
                 args.Pointer.Capture(null);
 
@@ -191,12 +184,14 @@ namespace DAGlynEditor
 
             UpdateMouseLocation(args);
             State.HandlePointerPressed(args);
+            args.Handled = true;
         }
 
         private void HandlePointerMoved(PointerEventArgs args)
         {
             UpdateMouseLocation(args);
             State.HandlePointerMoved(args);
+            args.Handled = true;
         }
 
         private void HandlePointerReleased(PointerReleasedEventArgs args)
@@ -204,6 +199,7 @@ namespace DAGlynEditor
             UpdateMouseLocation(args);
             args.Pointer.Capture(null);
             State.HandlePointerReleased(args);
+            args.Handled = true;
         }
 
         private void UpdateMouseLocation(PointerEventArgs args)
@@ -222,12 +218,6 @@ namespace DAGlynEditor
 
             // TODO 확인한다. 꼭. State.Enter(null)
             State.Enter(null);
-        }
-        
-        private void OnLoaded(object? sender, EventArgs e)
-        {
-            if (_itemsHost == null)
-                GetDAGlynEditorCanvas();
         }
 
         // 컨테이너 생성
@@ -276,12 +266,6 @@ namespace DAGlynEditor
                 myEll.Height = info2.H;
                 myEll.Fill = info2.Br;
             }
-        }
-
-        // TODO 시간날때 이름 생각해보자.
-        private void GetDAGlynEditorCanvas()
-        {
-            _itemsHost = this.FindControl<DAGlynEditorCanvas>("PART_ItemsHost");
         }
 
         #region State Handling

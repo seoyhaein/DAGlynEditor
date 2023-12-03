@@ -63,19 +63,21 @@ namespace DAGlynEditor
         //TODO 이벤트가 처리 되지 않는 것은 다른데서 처리 된것 같다. 이거 파악하자.
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            Debug.WriteLine("Called");
+            //Debug.WriteLine("Called");
+            RaiseContainerDragStartedEvent(e);
             e.Handled = true;
-            //RaiseContainerDragStartedEvent(e);
         }
 
         private void OnPointerMoved(object? sender, PointerEventArgs e)
         {
             RaiseContainerDraggingEvent(e);
+            e.Handled = true;
         }
 
         private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
             RaiseContainerDragCompletedEvent(e);
+            e.Handled = true;
         }
 
         private void OnContainerDragStarted(object? sender, ContainerEventArgs e)

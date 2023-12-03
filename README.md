@@ -34,7 +34,7 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~8/28/23 초기 Editor 구현~~    
 ~~8/29/23 VirtualCanvas 구현 필요 및 이를 통해서 OverlayLayer 재 구현 또는 새롭게 구현.~~  
 
-## 현재 DAGlynEditor 를 따로 떼어내서 구현중에 있음.
+~~## 현재 DAGlynEditor 를 따로 떼어내서 구현중에 있음.~~  
 
 ## 현재 개선해야할 부분에 대한 아이디어(그냥 막씀, 아래 문제 내용에 대한)
 ~~8/22/23 Node 에 Connector 연결~~  
@@ -55,8 +55,7 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 3. AvaloniaEdit Utils 에서 ExtensionMethods 일부와 FileReader 를 가지고 왔다. 향후 수정해서 사용한다.   
 4. InputConnectorPanel 삭제 예정.  
 5. Connector 추가/삭제는 Header 설정 창에서 설정.  
-6. Connector 자체가 없어도 된다는 생각도 하고 있다. 하지만 그것은 추후 업데이트 하자.  
-
+6. Connector 자체가 없어도 된다는 생각도 하고 있다. 하지만 그것은 추후 업데이트 하자. (하나로 하는 것ㅇ로 생각 변경. 계속 생각해보기)  
 
 # DAGlynEditor
 
@@ -77,6 +76,10 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~- Container 구현 및 Container 에 Node 연결, 그리고, 이때 작업을 편안하게 해주는 API 구현(11/13/23)~~  (다른 방안을 찾음.)
 - 컨테이너 핸들링 (드레그, 생성 삭제 등) 구현 필요. (11/15/23)
 ~~- DAGlyn 과 통합.~~  
+- BoxValue.cs 삭제 예정  
+- State 구문 삭제 예정  
+- Gesture 관련 구문 변경 및 삭제 예정  
+
 ## ViewPortLocation 변경 사항 설명
 ```
 마우스 포인터와 관련해서 원본소스에서는 마우스 포인터의 위치를 안에 있는 Panel 로 잡았다. 이걸 다시 상위 Canvas 로 넘겨주는 방식?? 인데
@@ -84,7 +87,7 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 생각을 좀더 해보자. 데이터가 위치할 패널에서 위치를 잡는게 맞는거 같기도 하다.
 ```
 ## 미룬 것들 (머리 안써도 되는 것들은 집중안될때 처리)
-1. MultiGetsture 테스트 코드 작성 (State 프로젝트 참고)
+1. MultiGetsture 테스트 코드 작성 (State 프로젝트 참고) -> 필요 없으면 삭제 예정.  
 
 ## 미룬 것들 (머리 써야 하는 것들) TODO 확인 필요.    
 1. Zoom 기능 추가 구현
