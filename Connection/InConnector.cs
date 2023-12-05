@@ -7,7 +7,6 @@ namespace DAGlynEditor
 {
     public class InputConnector : Connector
     {
-
         protected override Type StyleKeyOverride => typeof(Connector);
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
