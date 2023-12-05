@@ -5,9 +5,8 @@ using System.Diagnostics;
 
 namespace DAGlynEditor
 {
-    public class OutputConnector : Connector
+    public class OutConnector : Connector
     {
-
         protected override Type StyleKeyOverride => typeof(Connector);
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -28,7 +27,7 @@ namespace DAGlynEditor
             base.OnPointerMoved(e);
         }
 
-        protected override void PendingConnectionStartedRaiseEvent()
+        /*protected override void PendingConnectionStartedRaiseEvent()
         {
             var args = new PendingConnectionEventArgs(PendingConnectionStartedEvent, this, DataContext)
             {
@@ -37,9 +36,9 @@ namespace DAGlynEditor
             };
 
             RaiseEvent(args);
-        }
+        }*/
 
-        protected override void PendingConnectionDragRaiseEvent(Vector? offset)
+        /*protected override void PendingConnectionDragRaiseEvent(Vector? offset)
         {
             if (offset == null) return;
 
@@ -50,9 +49,9 @@ namespace DAGlynEditor
             };
 
             RaiseEvent(args);
-        }
+        }*/
 
-        protected override void PendingConnectionCompletedRaiseEvent()
+        /*protected override void PendingConnectionCompletedRaiseEvent()
         {
             // PendingConnectionEventArgs(DataContext) 관련해서 살펴봐야 함.
             var args = new PendingConnectionEventArgs(PendingConnectionCompletedEvent, this, DataContext)
@@ -60,6 +59,6 @@ namespace DAGlynEditor
                 //Anchor = Anchor,
             };
             RaiseEvent(args);
-        }
+        }*/
     }
 }

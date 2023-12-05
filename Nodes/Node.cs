@@ -1,20 +1,33 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Media;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.Templates;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Avalonia.Input;
 using Avalonia.Layout;
 
 namespace DAGlynEditor
 {
-    public class Node : TemplatedControl
+    // 일단 바로 Node 를 집어넣기 위해서 ICanvasItem 를 상속받는 것으로 수정함. ItemContainer 는 이것이 필요 없을 것 같기도 하다.이건 생각해보자.
+    public class Node : TemplatedControl, ICanvasItem
     {
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+        
         #region Constructors
 
-        public Node()
-        {
+        public Node() { }
 
+        public Node(Point? location)
+        {
+            if (location == null)
+                throw new ArgumentNullException(nameof(location), "Location cannot be null.");
+            
+            this.Location = (Point)location; 
         }
 
         // TODO Reactive 방식 추후 적용할지 고민해보자.
@@ -24,8 +37,54 @@ namespace DAGlynEditor
         }*/
 
         #endregion
+        
+        private void InitializeSubscriptions()
+        {
+            Observable.FromEventPattern<PointerPressedEventArgs>(
+                    h => this.PointerPressed += h,
+                    h => this.PointerPressed -= h)
+                .Subscribe(args => HandlePointerPressed(args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PointerEventArgs>(
+                    h => this.PointerMoved += h,
+                    h => this.PointerMoved -= h)
+                .Subscribe(args => HandlePointerMoved(args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PointerReleasedEventArgs>(
+                    h => this.PointerReleased += h,
+                    h => this.PointerReleased -= h)
+                .Subscribe(args => HandlePointerReleased(args.EventArgs))
+                .DisposeWith(_disposables);
+        }
+        
+        private void HandlePointerPressed(PointerPressedEventArgs args)
+        {
+            Debug.WriteLine("pressed called");
+        }
+
+        private void HandlePointerMoved(PointerEventArgs args)
+        {
+            Debug.WriteLine("moved called");
+        }
+
+        private void HandlePointerReleased(PointerReleasedEventArgs args)
+        {
+            Debug.WriteLine("released called");
+        }
 
         #region Dependency Properties
+        
+        public static readonly StyledProperty<Point> LocationProperty =
+            AvaloniaProperty.Register<ItemContainer, Point>(nameof(Location));
+
+        public Point Location
+        {
+            get => GetValue(LocationProperty);
+            set => SetValue(LocationProperty, value);
+        }
+        
         /*
             protected internal static readonly DependencyPropertyKey HasFooterPropertyKey = DependencyProperty.RegisterReadOnly(nameof(HasFooter), typeof(bool), typeof(Node), new FrameworkPropertyMetadata(BoxValue.False));
             public static readonly DependencyProperty HasFooterProperty = HasFooterPropertyKey.DependencyProperty;
@@ -158,59 +217,6 @@ namespace DAGlynEditor
         }
 
         #endregion
-
-        #region 참고. 이후 삭제
-        /*
-         *  /// <summary>
-        /// Initializes static members of the <see cref="Border"/> class.
-        /// </summary>
-        static Border()
-        {
-            AffectsRender<Border>(
-                BackgroundProperty,
-                BorderBrushProperty,
-                BorderThicknessProperty,
-                CornerRadiusProperty,
-                BoxShadowProperty);
-            AffectsMeasure<Border>(BorderThicknessProperty);
-        }
-
-        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-        {
-            base.OnPropertyChanged(change);
-            switch (change.Property.Name)
-            {
-                case nameof(UseLayoutRounding):
-                case nameof(BorderThickness):
-                    _layoutThickness = null;
-                    break;
-                case nameof(CornerRadius):
-                    if (_borderVisual != null)
-                        _borderVisual.CornerRadius = CornerRadius;
-                    break;
-            }
-        }
-
-         static TextArea()
-        {
-            KeyboardNavigation.TabNavigationProperty.OverrideDefaultValue<TextArea>(KeyboardNavigationMode.None);
-            FocusableProperty.OverrideDefaultValue<TextArea>(true);
-
-            DocumentProperty.Changed.Subscribe(OnDocumentChanged);
-            OptionsProperty.Changed.Subscribe(OnOptionsChanged);
-
-            AffectsArrange<TextArea>(OffsetProperty);
-            AffectsRender<TextArea>(OffsetProperty);
-
-            TextInputMethodClientRequestedEvent.AddClassHandler<TextArea>((ta, e) =>
-            {
-                if (!ta.IsReadOnly)
-                {
-                    e.Client = ta._imClient;
-                }             
-            });
-        }
-         */
-        #endregion
+        
     }
 }

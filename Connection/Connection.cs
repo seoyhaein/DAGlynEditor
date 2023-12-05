@@ -74,26 +74,26 @@ namespace DAGlynEditor
         private const double _baseOffset = 100d;
         // ReSharper disable once InconsistentNaming
         private const double _offsetGrowthRate = 25d;
-
-        /// <summary>
-        /// Gets a vector that has its coordinates set to 0.
-        /// </summary>
+        
+        //TODO 향후 PendingConnection 만들어 줄때 사용할 것 같다.
+        public static readonly Size DefaultArrowSize = new Size(7, 6);
         protected static readonly Vector ZeroVector = new(0d, 0d);
+        
         #endregion
 
         #region Dependency Properties
         // Point, Size 의 경우는 Avalonia.Point, Avalonia.Size 로 사용한다.  
         public static readonly StyledProperty<Point> SourceProperty =
-            AvaloniaProperty.Register<Connection, Point>(nameof(Source), default);
+            AvaloniaProperty.Register<Connection, Point>(nameof(Source), default(Point));
 
         public static readonly StyledProperty<Point> TargetProperty =
-            AvaloniaProperty.Register<Connection, Point>(nameof(Target), default);
+            AvaloniaProperty.Register<Connection, Point>(nameof(Target), default(Point));
 
         public static readonly StyledProperty<Size> SourceOffsetProperty =
-            AvaloniaProperty.Register<Connection, Size>(nameof(SourceOffset), default);
+            AvaloniaProperty.Register<Connection, Size>(nameof(SourceOffset), default(Size));
 
         public static readonly StyledProperty<Size> TargetOffsetProperty =
-            AvaloniaProperty.Register<Connection, Size>(nameof(TargetOffset), default);
+            AvaloniaProperty.Register<Connection, Size>(nameof(TargetOffset), default(Size));
 
         public static readonly StyledProperty<ConnectionOffsetMode> OffsetModeProperty =
             AvaloniaProperty.Register<Connection, ConnectionOffsetMode>(nameof(OffsetMode), default);
@@ -108,7 +108,7 @@ namespace DAGlynEditor
             AvaloniaProperty.Register<Connection, double>(nameof(Spacing), 30);
 
         public static readonly StyledProperty<Size> ArrowSizeProperty =
-            AvaloniaProperty.Register<Connection, Size>(nameof(ArrowSize), defaultValue: BoxValue.ArrowSize);
+            AvaloniaProperty.Register<Connection, Size>(nameof(ArrowSize), defaultValue: DefaultArrowSize);
 
         public Point Source
         {

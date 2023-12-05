@@ -40,7 +40,7 @@
                             Background="{TemplateBinding BorderBrush}" />
 					<StackPanel Orientation="Horizontal"
                                 Margin="{TemplateBinding Padding}">
-						<controls:InputConnector/>
+						<controls:InConnector/>
 					</StackPanel>
 				</Grid>
 			</ControlTemplate>

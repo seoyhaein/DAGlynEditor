@@ -223,33 +223,30 @@ namespace DAGlynEditor
         // 컨테이너 생성
         protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)
         {
-            // 아이템으로 컨테이너를 선택할 수 있도록 해야 할듯하다.
-            // 컨테이너는 직접 Node 로 만들어주는 방향으로 간다.
-
-            if (index == 0)
-                return new MyRect();
-            else if (index == 1)
-                return new MyEllipse();
+            /*if (item is MyRectInfo info)
+                return new Node(info.Location);
             else
-                return new ItemContainer();
+            {
+                return new Node();
+            }*/
 
-            //return new ItemContainer();
-            //return new MyRect();
+            return new ItemContainer();
         }
 
         // 컨테이너 설정
         // 컨테이너를 바로 Node 로 설정해주는 것도 가능할 것으로 판단된다.
+        // 일단 주석으로 남겨 놓았는데, 움직임을 구현하기 위해서는 남겨놓는다.
         protected override void PrepareContainerForItemOverride(Control container, object? item, int index)
         {
             // 일단 임시 땜방 코드 테스트를 위해서.
-            if (container is MyRect myRect && item is MyRectInfo info)
+            /*if (container is MyRect myRect && item is MyRectInfo info)
             {
                 myRect.Location = info.Location;
                 myRect.Width = info.W;
                 myRect.Height = info.H;
                 myRect.Fill = info.Br;
             }
-
+            */    
             if (container is ItemContainer myContainer && item is MyRectInfo info1)
             {
                 myContainer.Location = info1.Location;
@@ -258,14 +255,14 @@ namespace DAGlynEditor
                 myContainer.Background = Brushes.Yellow;
                 //myRect.Fill = info.Br;
             }
-
+            /*
             if (container is MyEllipse myEll && item is MyRectInfo info2)
             {
                 myEll.Location = info2.Location;
                 myEll.Width = info2.W;
                 myEll.Height = info2.H;
                 myEll.Fill = info2.Br;
-            }
+            }*/
         }
 
         #region State Handling

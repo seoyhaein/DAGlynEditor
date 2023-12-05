@@ -1,29 +1,33 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Interactivity;
 
 namespace DAGlynEditor
 {
     public delegate void PendingConnectionEventHandler(object? sender, PendingConnectionEventArgs e);
 
+    // 클래스 설명을 추가 필요
     public class PendingConnectionEventArgs : RoutedEventArgs
     {
-        #region Constructors
+        // 기본 생성자에 대한 설명을 추가 필요
         public PendingConnectionEventArgs()
         {
         }
 
+        // DataContext를 설정하는 생성자에 대한 설명 추가 필요
         public PendingConnectionEventArgs(object? dataContext)
-         => SourceConnectorDataContext = dataContext;
-
-        public PendingConnectionEventArgs(RoutedEvent routedEvent, object? source, object? dataContext)
-            : base(routedEvent, source as Interactive)
         {
             SourceConnectorDataContext = dataContext;
         }
-        #endregion
+        
+        public PendingConnectionEventArgs(RoutedEvent routedEvent, object? source, object? dataContext)
+            : base(routedEvent, source ?? throw new ArgumentNullException(nameof(source)))
+        {
+            SourceConnectorDataContext = dataContext;
+        }
 
-        #region fields
-        public Point Anchor { get; set; }
+        // 각 속성에 대한 설명을 추가
+        public Point Anchor { get; set; } = new Point(); // 기본값 설정
 
         public object? SourceConnectorDataContext { get; }
 
@@ -34,6 +38,7 @@ namespace DAGlynEditor
         public double OffsetY { get; set; }
 
         public bool Canceled { get; set; }
-        #endregion
+
+        public object? Sender { get; set; }
     }
 }

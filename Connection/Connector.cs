@@ -6,11 +6,10 @@ using Avalonia.VisualTree;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.Templates;
-
-// IDisposable 때문에 넣었지만 이건 테스트 해서 살펴봐야 할듯하다. 
-// 일단 주석처리 해두었다.
 using System;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace DAGlynEditor
 {
@@ -18,7 +17,7 @@ namespace DAGlynEditor
     public class Connector : TemplatedControl
     {
         #region Routed Events
-        public static readonly RoutedEvent<PendingConnectionEventArgs> PendingConnectionStartedEvent =
+        protected static readonly RoutedEvent<PendingConnectionEventArgs> PendingConnectionStartedEvent =
             RoutedEvent.Register<Connector, PendingConnectionEventArgs>(nameof(PendingConnectionStarted), RoutingStrategies.Bubble);
 
         public static readonly RoutedEvent<PendingConnectionEventArgs> PendingConnectionCompletedEvent =
@@ -48,6 +47,12 @@ namespace DAGlynEditor
         #endregion
 
         #region Constructor
+
+        public Connector()
+        {
+            InitializeSubscriptions();
+        }
+
         static Connector()
         {
             FocusableProperty.OverrideDefaultValue<Connector>(true);
@@ -72,7 +77,7 @@ namespace DAGlynEditor
         }
 
         public static readonly StyledProperty<object> HeaderProperty =
-            AvaloniaProperty.Register<InputConnector, object>(nameof(Header));
+            AvaloniaProperty.Register<InConnector, object>(nameof(Header));
 
         public object Header
         {
@@ -81,7 +86,7 @@ namespace DAGlynEditor
         }
 
         public static readonly StyledProperty<DataTemplate> HeaderTemplateProperty =
-            AvaloniaProperty.Register<InputConnector, DataTemplate>(nameof(HeaderTemplate));
+            AvaloniaProperty.Register<InConnector, DataTemplate>(nameof(HeaderTemplate));
 
         public DataTemplate HeaderTemplate
         {
@@ -102,27 +107,89 @@ namespace DAGlynEditor
                 throw new InvalidOperationException("Template is missing the required 'PART_CONNECTOR' element.");
             }
         }
-
-        // 일단 참고용으로 넣어 둔다. 향후 삭제 예정
-        /*protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+        private void InitializeSubscriptions()
         {
-            base.OnAttachedToVisualTree(e);
+            Observable.FromEventPattern<PointerPressedEventArgs>(
+                    h => this.PointerPressed += h,
+                    h => this.PointerPressed -= h)
+                .Subscribe(args => HandlePointerPressed(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables);
 
-            if (Container is string containerName)
+            Observable.FromEventPattern<PointerEventArgs>(
+                    h => this.PointerMoved += h,
+                    h => this.PointerMoved -= h)
+                .Subscribe(args => HandlePointerMoved(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PointerReleasedEventArgs>(
+                    h => this.PointerReleased += h,
+                    h => this.PointerReleased -= h)
+                .Subscribe(args => HandlePointerReleased(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables); 
+        }
+        
+        private void HandlePointerPressed(object? sender, PointerPressedEventArgs args)
+        {
+            if (!args.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                var containerControl = this.FindAncestorOfType<Control>(containerName);
-                if (containerControl != null)
-                {
-                    Container = containerControl;
-                }
-                else
-                {
-                    throw new InvalidOperationException($"No control found with the name {containerName}.");
-                }
+                return;
             }
-        }*/
 
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+            if (sender == null) return;
+
+            Focus();
+            args.Pointer.Capture(this);
+
+            if (this.Equals(args.Pointer.Captured))
+            {
+                // 일단 여기서 Anchor 업데이트. 땜방코드
+                if (Container == null) return;
+                var check = UpdateAnchor();
+
+                // TODO 추후 로그로
+                if (!check) throw new InvalidOperationException("Failed to update the Anchor.");
+                StartedRaiseEvent(sender);
+                Debug.Print("OnPointerPressed");
+                args.Handled = true;
+            }
+        }
+
+        private void HandlePointerMoved(object? sender, PointerEventArgs args)
+        {
+            if (sender == null) return;
+            if (_thumbCenter.HasValue)
+            {
+                Vector? offset = args.GetPosition(Thumb) - _thumbCenter.Value;
+                DragRaiseEvent(sender, offset);
+            }
+            args.Handled = true;
+        }
+
+        private void HandlePointerReleased(object? sender, PointerReleasedEventArgs args)
+        {
+            if (sender == null) return;
+            if (this.Equals(args.Pointer.Captured))
+            {
+                if (Thumb != null)
+                {
+                    _thumbCenter = new Point(Thumb.Bounds.Width / 2, Thumb.Bounds.Height / 2);
+                }
+
+                CompletedRaiseEvent(sender);
+                // capture 해제.
+                args.Pointer.Capture(null);
+                args.Handled = true;
+            }
+        }
+        
+        public void Dispose()
+        {
+            _disposables.Dispose();
+        }
+        
+        /*protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);
             if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
@@ -145,9 +212,9 @@ namespace DAGlynEditor
                 Debug.Print("OnPointerPressed");
                 e.Handled = true;
             }
-        }
+        }*/
 
-        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        /*protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
             base.OnPointerReleased(e);
             if (this.Equals(e.Pointer.Captured))
@@ -163,9 +230,9 @@ namespace DAGlynEditor
                 e.Handled = true;
             }
             Debug.Print("OnPointerReleased");
-        }
+        }*/
 
-        protected override void OnPointerMoved(PointerEventArgs e)
+        /*protected override void OnPointerMoved(PointerEventArgs e)
         {
             base.OnPointerMoved(e);
 
@@ -175,21 +242,22 @@ namespace DAGlynEditor
                 PendingConnectionDragRaiseEvent(offset);
             }
             e.Handled = true;
-        }
+        }*/
 
         // DataContext 는 살펴보자.
-        protected virtual void PendingConnectionStartedRaiseEvent()
+        private void StartedRaiseEvent(object? sender)
         {
             var args = new PendingConnectionEventArgs(PendingConnectionStartedEvent, this, DataContext)
             {
                 Anchor = Anchor,
+                Sender = sender,
             };
 
             RaiseEvent(args);
         }
 
         // 빈공란으로 향후 남겨두자.
-        protected virtual void PendingConnectionDragRaiseEvent(Vector? offset)
+        private void DragRaiseEvent(object? sender ,Vector? offset)
         {
             if (offset == null) return;
 
@@ -197,16 +265,18 @@ namespace DAGlynEditor
             {
                 OffsetX = offset.Value.X,
                 OffsetY = offset.Value.Y,
+                Sender = sender,
             };
 
             RaiseEvent(args);
         }
 
-        protected virtual void PendingConnectionCompletedRaiseEvent()
+        private void CompletedRaiseEvent(object? sender)
         {
             // PendingConnectionEventArgs(DataContext) 관련해서 살펴봐야 함.
             var args = new PendingConnectionEventArgs(PendingConnectionCompletedEvent, this, DataContext)
             {
+                Sender = sender,
                 //Anchor = Anchor,
             };
             RaiseEvent(args);
@@ -233,18 +303,5 @@ namespace DAGlynEditor
             Anchor = new Point(Container.Location.X + relativeLocation.Value.X, Container.Location.Y + relativeLocation.Value.Y);
             return true;
         }
-
-        // 테스트 용도로 만들어 짐.
-        public T? FindParent<T>(Visual control) where T : Visual
-        {
-            var parentOfType = this.FindAncestorOfType<T>();
-            return parentOfType;
-        }
-
-        private Vector? ConvertFrom(Size? size)
-        {
-            return size.HasValue ? new Vector(size.Value.Width, size.Value.Height) : (Vector?)null;
-        }
-
     }
 }

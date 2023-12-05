@@ -59,7 +59,7 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 
 # DAGlynEditor
 
-## 진행 사항
+## 진행 사항 (잠시 commit 중단. Node 디자인 적용 후 커밋)
 ~~- OverlayLayer 로 Canvas 구현하였음.~~     
 - ItemsControl 연결 해서 위치 정확히 렌더링 되는지 확인 필요.  
 - 테스트 코드 삭제 필요 및 추가 기능 구현 세부화 할 필요 있음.  
@@ -76,9 +76,13 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~- Container 구현 및 Container 에 Node 연결, 그리고, 이때 작업을 편안하게 해주는 API 구현(11/13/23)~~  (다른 방안을 찾음.)
 - 컨테이너 핸들링 (드레그, 생성 삭제 등) 구현 필요. (11/15/23)
 ~~- DAGlyn 과 통합.~~  
-- BoxValue.cs 삭제 예정  
+~~- BoxValue.cs 삭제 예정~~    
 - State 구문 삭제 예정  
 - Gesture 관련 구문 변경 및 삭제 예정  
+- Node 디자인 및 axaml 구현 -> 노드끼리 연결되는 부분 구현 -> Connection/PendingConnection 상세 구현 및 정리 (이후, 향후 개발 사항 삭제)
+- 코드 정리시 위치에 대한 규칙 정할것  
+- Node 관련 이미지 찾기 및 제작  
+- Connector 코드 정리 및 수정
 
 ## ViewPortLocation 변경 사항 설명
 ```

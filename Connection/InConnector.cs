@@ -2,63 +2,57 @@
 using Avalonia.Input;
 using System;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Avalonia.Interactivity;
 
 namespace DAGlynEditor
 {
-    public class InputConnector : Connector
+    public class InConnector : Connector
     {
         protected override Type StyleKeyOverride => typeof(Connector);
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        public InConnector()
         {
-            Debug.Print("InputConnector Pointer Pressed");
-            base.OnPointerPressed(e);
+            InitializeSubscriptions();
+        }
+        
+        private void InitializeSubscriptions()
+        {
+            Observable.FromEventPattern<PendingConnectionEventHandler, PendingConnectionEventArgs>(
+                    h => this.PendingConnectionStarted += h,
+                    h => this.PendingConnectionStarted -= h)
+                .Subscribe(args => HandleStarted(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PendingConnectionEventHandler,PendingConnectionEventArgs>(
+                    h => this.PendingConnectionDrag += h,
+                    h => this.PendingConnectionDrag -= h)
+                .Subscribe(args => HandleDrag(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PendingConnectionEventHandler, PendingConnectionEventArgs>(
+                    h => this.PendingConnectionCompleted += h,
+                    h => this.PendingConnectionCompleted -= h)
+                .Subscribe(args => HandleCompleted(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables); 
         }
 
-        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        private void HandleStarted(object? sender, PendingConnectionEventArgs e)
         {
-            Debug.Print("InputConnector Pointer Released");
-            base.OnPointerReleased(e);
+            // sender 따라 처리   
         }
-
-        protected override void OnPointerMoved(PointerEventArgs e)
+        
+        private void HandleDrag(object? sender, PendingConnectionEventArgs e)
         {
-            Debug.Print("InputConnector Pointer Moved");
-            base.OnPointerMoved(e);
+            
         }
-
-        protected override void PendingConnectionStartedRaiseEvent()
+        
+        private void HandleCompleted(object? sender, PendingConnectionEventArgs e)
         {
-            var args = new PendingConnectionEventArgs(PendingConnectionStartedEvent, this, DataContext)
-            {
-                Anchor = Anchor,
-                // 여기에서 다른 필드 또는 프로퍼티를 설정할 수 있습니다.
-            };
-
-            RaiseEvent(args);
+            
         }
-
-        protected override void PendingConnectionDragRaiseEvent(Vector? offset)
-        {
-            if (offset == null) return;
-
-            var args = new PendingConnectionEventArgs(PendingConnectionDragEvent, this, DataContext)
-            {
-                OffsetX = offset.Value.X,
-                OffsetY = offset.Value.Y,
-            };
-
-            RaiseEvent(args);
-        }
-
-        protected override void PendingConnectionCompletedRaiseEvent()
-        {
-            // PendingConnectionEventArgs(DataContext) 관련해서 살펴봐야 함.
-            var args = new PendingConnectionEventArgs(PendingConnectionCompletedEvent, this, DataContext)
-            {
-                //Anchor = Anchor,
-            };
-            RaiseEvent(args);
-        }
+        
     }
 }

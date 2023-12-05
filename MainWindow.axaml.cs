@@ -11,9 +11,10 @@ namespace DAGlynEditor
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = this;
+            //DataContext = this;
         }
-
+        
+        //TODO 이부분 향후 어떻게 적용할지 고민해야 함.
         public ObservableCollection<MyRectInfo> MyItems { get; set; } = new ObservableCollection<MyRectInfo>
         {
             new MyRectInfo
@@ -25,7 +26,7 @@ namespace DAGlynEditor
             },
             new MyRectInfo
             {
-                Location = new Point(20, 20),
+                Location = new Point(200, 200),
                 W = 150,
                 H = 150,
                 Br = Brushes.Blue
