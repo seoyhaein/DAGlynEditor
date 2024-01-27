@@ -2,63 +2,107 @@
 using Avalonia.Input;
 using System;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace DAGlynEditor
 {
     public class OutConnector : Connector
     {
         protected override Type StyleKeyOverride => typeof(Connector);
-
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+        
+        public OutConnector()
         {
-            Debug.Print("OutputConnector Pointer Pressed");
-            base.OnPointerPressed(e);
+            InitializeSubscriptions();
         }
 
-        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        private void InitializeSubscriptions()
         {
-            Debug.Print("OutputConnector Pointer Released");
-            base.OnPointerReleased(e);
+            Observable.FromEventPattern<PointerReleasedEventArgs>(
+                    h => this.PointerReleased += h,
+                    h => this.PointerReleased -= h)
+                .Subscribe(args => HandlePointerReleased(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables);
         }
-
-        protected override void OnPointerMoved(PointerEventArgs e)
+        
+        /*private void InitializeSubscriptions()
         {
-            Debug.Print("OutputConnector Pointer Moved");
-            base.OnPointerMoved(e);
+            Observable.FromEventPattern<PendingConnectionEventHandler, PendingConnectionEventArgs>(
+                    h => this.PendingConnectionStarted += h,
+                    h => this.PendingConnectionStarted -= h)
+                .Subscribe(args => HandleStarted(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PendingConnectionEventHandler,PendingConnectionEventArgs>(
+                    h => this.PendingConnectionDrag += h,
+                    h => this.PendingConnectionDrag -= h)
+                .Subscribe(args => HandleDrag(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<PendingConnectionEventHandler, PendingConnectionEventArgs>(
+                    h => this.PendingConnectionCompleted += h,
+                    h => this.PendingConnectionCompleted -= h)
+                .Subscribe(args => HandleCompleted(args.Sender, args.EventArgs))
+                .DisposeWith(_disposables); 
+        }*/
+
+        /*private void HandleStarted(object? sender, PendingConnectionEventArgs e)
+        {
+            // sender 따라 처리   
+            if (sender == null) return;
+            if (!this.Equals(sender)) return;
+
+            Debug.WriteLine("Do not Drag start");
+            
+            /*if (e.CapturedObject == null)
+                Debug.WriteLine("startd captured is null");
+            else Debug.WriteLine("started not null");#1#
+            
         }
-
-        /*protected override void PendingConnectionStartedRaiseEvent()
+        
+        private void HandleDrag(object? sender, PendingConnectionEventArgs e)
         {
-            var args = new PendingConnectionEventArgs(PendingConnectionStartedEvent, this, DataContext)
-            {
-                Anchor = Anchor,
-                // 여기에서 다른 필드 또는 프로퍼티를 설정할 수 있습니다.
-            };
+            if (sender == null) return;
+            if (!this.Equals(sender)) return;
 
-            RaiseEvent(args);
-        }*/
-
-        /*protected override void PendingConnectionDragRaiseEvent(Vector? offset)
+            Debug.WriteLine("Do not Dragging");
+            
+            /*if (e.CapturedObject == null)
+                Debug.WriteLine("drag captured is null");
+            else Debug.WriteLine("drag not null");#1#
+        }
+        
+        private void HandleCompleted(object? sender, PendingConnectionEventArgs e)
         {
-            if (offset == null) return;
-
-            var args = new PendingConnectionEventArgs(PendingConnectionDragEvent, this, DataContext)
-            {
-                OffsetX = offset.Value.X,
-                OffsetY = offset.Value.Y,
-            };
-
-            RaiseEvent(args);
+            if (sender == null) return;
+            if (!this.Equals(sender)) return;
+            // Handle 등 살펴 봐야 함.
+            Debug.WriteLine("ok");
         }*/
-
-        /*protected override void PendingConnectionCompletedRaiseEvent()
+        
+        private void HandlePointerReleased(object? sender, PointerReleasedEventArgs args)
         {
-            // PendingConnectionEventArgs(DataContext) 관련해서 살펴봐야 함.
-            var args = new PendingConnectionEventArgs(PendingConnectionCompletedEvent, this, DataContext)
+            if (sender == null) return;
+            if (this.Equals(args.Pointer.Captured))
             {
-                //Anchor = Anchor,
-            };
-            RaiseEvent(args);
-        }*/
+                if (Thumb != null)
+                {
+                    _thumbCenter = new Point(Thumb.Bounds.Width / 2, Thumb.Bounds.Height / 2);
+                }
+
+                //CompletedRaiseEvent(args);
+                // capture 해제.
+                args.Pointer.Capture(null);
+               
+            }
+            _isPointerPressed = false;
+            args.Handled = true;
+        }
+        
+        public void Dispose()
+        {
+            _disposables.Dispose();
+        }
     }
 }

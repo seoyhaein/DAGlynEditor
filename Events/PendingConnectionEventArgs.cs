@@ -40,5 +40,7 @@ namespace DAGlynEditor
         public bool Canceled { get; set; }
 
         public object? Sender { get; set; }
+        
+        public object? CapturedObject { get; set; }
     }
 }

@@ -14,17 +14,24 @@ using System.Reactive.Linq;
 namespace DAGlynEditor
 {
     public delegate void PreviewLocationChanged(Point newLocation);
+
     public class Connector : TemplatedControl
     {
+        protected bool _isPointerPressed;
+        
         #region Routed Events
+
         protected static readonly RoutedEvent<PendingConnectionEventArgs> PendingConnectionStartedEvent =
-            RoutedEvent.Register<Connector, PendingConnectionEventArgs>(nameof(PendingConnectionStarted), RoutingStrategies.Bubble);
+            RoutedEvent.Register<Connector, PendingConnectionEventArgs>(nameof(PendingConnectionStarted),
+                RoutingStrategies.Bubble);
 
         public static readonly RoutedEvent<PendingConnectionEventArgs> PendingConnectionCompletedEvent =
-            RoutedEvent.Register<Connector, PendingConnectionEventArgs>(nameof(PendingConnectionCompleted), RoutingStrategies.Bubble);
+            RoutedEvent.Register<Connector, PendingConnectionEventArgs>(nameof(PendingConnectionCompleted),
+                RoutingStrategies.Bubble);
 
         public static readonly RoutedEvent<PendingConnectionEventArgs> PendingConnectionDragEvent =
-            RoutedEvent.Register<Connector, PendingConnectionEventArgs>(nameof(PendingConnectionDrag), RoutingStrategies.Bubble);
+            RoutedEvent.Register<Connector, PendingConnectionEventArgs>(nameof(PendingConnectionDrag),
+                RoutingStrategies.Bubble);
 
         public event PendingConnectionEventHandler PendingConnectionStarted
         {
@@ -61,11 +68,14 @@ namespace DAGlynEditor
         #endregion
 
         #region Fields & Dependency Properties
-
-        // Interactive 일단 바뀔 수 있음.
-        protected Interactive? Thumb { get; private set; }
-        private Point? _thumbCenter;
-        public ItemContainer? Container { get; set; }
+        
+        protected Control? Thumb { get; set; }
+        protected Point? _thumbCenter;
+        
+        //Test
+        protected Canvas? myCanvas { get; set; }
+        // 구현 수정
+        //public ItemContainer? Container { get; set; }
 
         public static readonly StyledProperty<Point> AnchorProperty =
             AvaloniaProperty.Register<Connector, Point>(nameof(Anchor));
@@ -93,22 +103,22 @@ namespace DAGlynEditor
             get => GetValue(HeaderTemplateProperty);
             set => SetValue(HeaderTemplateProperty, value);
         }
+
         #endregion
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
             Thumb = e.NameScope.Find<Ellipse>("PART_CONNECTOR");
-            Container = this.FindAncestorOfType<ItemContainer>();
-
-            // TODO 추후 로그로
             if (Thumb == null)
-            {
                 throw new InvalidOperationException("Template is missing the required 'PART_CONNECTOR' element.");
-            }
+
+            myCanvas = this.FindControl<Canvas>("MyCanvas");
+
         }
-        
+
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
+
         private void InitializeSubscriptions()
         {
             Observable.FromEventPattern<PointerPressedEventArgs>(
@@ -127,9 +137,9 @@ namespace DAGlynEditor
                     h => this.PointerReleased += h,
                     h => this.PointerReleased -= h)
                 .Subscribe(args => HandlePointerReleased(args.Sender, args.EventArgs))
-                .DisposeWith(_disposables); 
+                .DisposeWith(_disposables);
         }
-        
+
         private void HandlePointerPressed(object? sender, PointerPressedEventArgs args)
         {
             if (!args.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
@@ -145,12 +155,12 @@ namespace DAGlynEditor
             if (this.Equals(args.Pointer.Captured))
             {
                 // 일단 여기서 Anchor 업데이트. 땜방코드
-                if (Container == null) return;
-                var check = UpdateAnchor();
+                //if (Container == null) return;
+                //var check = UpdateAnchor();
 
                 // TODO 추후 로그로
-                if (!check) throw new InvalidOperationException("Failed to update the Anchor.");
-                StartedRaiseEvent(sender);
+                //if (!check) throw new InvalidOperationException("Failed to update the Anchor.");
+                StartedRaiseEvent(args);
                 Debug.Print("OnPointerPressed");
                 args.Handled = true;
             }
@@ -162,8 +172,9 @@ namespace DAGlynEditor
             if (_thumbCenter.HasValue)
             {
                 Vector? offset = args.GetPosition(Thumb) - _thumbCenter.Value;
-                DragRaiseEvent(sender, offset);
+                DragRaiseEvent(args, offset);
             }
+
             args.Handled = true;
         }
 
@@ -177,87 +188,34 @@ namespace DAGlynEditor
                     _thumbCenter = new Point(Thumb.Bounds.Width / 2, Thumb.Bounds.Height / 2);
                 }
 
-                CompletedRaiseEvent(sender);
+                CompletedRaiseEvent(args);
                 // capture 해제.
                 args.Pointer.Capture(null);
                 args.Handled = true;
             }
         }
-        
+
         public void Dispose()
         {
             _disposables.Dispose();
         }
         
-        /*protected override void OnPointerPressed(PointerPressedEventArgs e)
-        {
-            base.OnPointerPressed(e);
-            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            {
-                return;
-            }
-
-            Focus();
-            e.Pointer.Capture(this);
-
-            if (this.Equals(e.Pointer.Captured))
-            {
-                // 일단 여기서 Anchor 업데이트. 땜방코드
-                if (Container == null) return;
-                var check = UpdateAnchor();
-
-                // TODO 추후 로그로
-                if (!check) throw new InvalidOperationException("Failed to update the Anchor.");
-                PendingConnectionStartedRaiseEvent();
-                Debug.Print("OnPointerPressed");
-                e.Handled = true;
-            }
-        }*/
-
-        /*protected override void OnPointerReleased(PointerReleasedEventArgs e)
-        {
-            base.OnPointerReleased(e);
-            if (this.Equals(e.Pointer.Captured))
-            {
-                if (Thumb != null)
-                {
-                    _thumbCenter = new Point(Thumb.Bounds.Width / 2, Thumb.Bounds.Height / 2);
-                }
-
-                PendingConnectionCompletedRaiseEvent();
-                // capture 해제.
-                e.Pointer.Capture(null);
-                e.Handled = true;
-            }
-            Debug.Print("OnPointerReleased");
-        }*/
-
-        /*protected override void OnPointerMoved(PointerEventArgs e)
-        {
-            base.OnPointerMoved(e);
-
-            if (_thumbCenter.HasValue)
-            {
-                Vector? offset = e.GetPosition(Thumb) - _thumbCenter.Value;
-                PendingConnectionDragRaiseEvent(offset);
-            }
-            e.Handled = true;
-        }*/
-
         // DataContext 는 살펴보자.
-        private void StartedRaiseEvent(object? sender)
+        private void StartedRaiseEvent(PointerPressedEventArgs e)
         {
             var args = new PendingConnectionEventArgs(PendingConnectionStartedEvent, this, DataContext)
             {
                 Anchor = Anchor,
-                Sender = sender,
+                Sender = e.Source,
+                CapturedObject = e.Pointer.Captured,
             };
-
+            
+            
             RaiseEvent(args);
         }
 
         // 빈공란으로 향후 남겨두자.
-        private void DragRaiseEvent(object? sender ,Vector? offset)
+        private void DragRaiseEvent(PointerEventArgs e, Vector? offset)
         {
             if (offset == null) return;
 
@@ -265,34 +223,41 @@ namespace DAGlynEditor
             {
                 OffsetX = offset.Value.X,
                 OffsetY = offset.Value.Y,
-                Sender = sender,
+                Sender = e.Source,
+                CapturedObject = e.Pointer.Captured,
             };
 
             RaiseEvent(args);
         }
 
-        private void CompletedRaiseEvent(object? sender)
+        private void CompletedRaiseEvent(PointerReleasedEventArgs e)
         {
             // PendingConnectionEventArgs(DataContext) 관련해서 살펴봐야 함.
             var args = new PendingConnectionEventArgs(PendingConnectionCompletedEvent, this, DataContext)
             {
-                Sender = sender,
+                Sender = e.Source,
+                CapturedObject = e.Pointer.Captured,
                 //Anchor = Anchor,
             };
             RaiseEvent(args);
         }
-
+        
+        // 일단 주석 처리함.
+        /*
         private bool UpdateAnchor()
         {
             if (Container == null || Thumb == null) return false;
+
             // 인라인
-            Vector? ToVector(Size? size) => size.HasValue ? new Vector(size.Value.Width, size.Value.Height) : (Vector?)null;
+            Vector? ToVector(Size? size) =>
+                size.HasValue ? new Vector(size.Value.Width, size.Value.Height) : (Vector?)null;
 
             var thumbVector = ToVector(Thumb.Bounds.Size);
             var containerRenderedVector = ToVector(Container.Bounds.Size);
             var containerDesiredVector = ToVector(Container.DesiredSize);
 
-            if (!thumbVector.HasValue || !containerRenderedVector.HasValue || !containerDesiredVector.HasValue) return false;
+            if (!thumbVector.HasValue || !containerRenderedVector.HasValue || !containerDesiredVector.HasValue)
+                return false;
 
             var marginDifference = containerRenderedVector.Value - containerDesiredVector.Value;
             var adjustedPoint = (Point)thumbVector.Value / 2 - marginDifference / 2;
@@ -300,8 +265,10 @@ namespace DAGlynEditor
             var relativeLocation = Thumb.TranslatePoint(adjustedPoint, Container);
             if (!relativeLocation.HasValue) return false;
 
-            Anchor = new Point(Container.Location.X + relativeLocation.Value.X, Container.Location.Y + relativeLocation.Value.Y);
+            Anchor = new Point(Container.Location.X + relativeLocation.Value.X,
+                Container.Location.Y + relativeLocation.Value.Y);
             return true;
         }
+        */
     }
 }

@@ -1,6 +1,7 @@
-namespace DAGlynEditor;
-
-public class PendingConnection
+namespace DAGlynEditor
 {
-    
+    public class PendingConnection
+    {
+
+    }
 }

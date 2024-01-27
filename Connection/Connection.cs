@@ -9,80 +9,85 @@ namespace DAGlynEditor
     public enum ConnectionOffsetMode
     {
         /// <summary>
-        /// No offset applied.
+        /// 오프셋 없음.
         /// </summary>
         None,
 
         /// <summary>
-        /// The offset is applied in a circle around the point.
+        /// 포인트 주변에 원형으로 오프셋 적용.
         /// </summary>
         Circle,
 
         /// <summary>
-        /// The offset is applied in a rectangle shape around the point.
+        /// 포인트 주변에 사각형 형태로 오프셋 적용.
         /// </summary>
         Rectangle,
 
         /// <summary>
-        /// The offset is applied in a rectangle shape around the point, perpendicular to the edges.
+        /// 포인트 주변에 사각형 형태로 오프셋 적용하되, 모서리에 수직.
         /// </summary>
         Edge,
     }
 
+    //TODO 향후 이름은 수정할 수 있음.
+    public enum LineShape
+    {
+        Line,
+        Circuit,
+        Quadratic,
+    }
+
 
     /// <summary>
-    /// The direction in which a connection is oriented.
+    /// 연결이 지향하는 방향.
     /// </summary>
-    /// 방향에 대한 정의를 한다.
+    /// 연결의 방향에 대한 정의를 한다.
     public enum ConnectionDirection
     {
-        Forward,
-        Backward
+        Forward, // 앞쪽 방향
+        Backward // 뒤쪽 방향
     }
 
     /// <summary>
-    /// The end at which the arrow head is drawn.
+    /// 화살표 머리가 그려지는 위치.
     /// </summary>
     public enum ArrowHeadEnds
     {
         /// <summary>
-        /// Arrow head at start.
+        /// 시작점에 화살표 머리.
         /// </summary>
         Start,
 
         /// <summary>
-        /// Arrow head at end.
+        /// 끝점에 화살표 머리.
         /// </summary>
         End,
 
         /// <summary>
-        /// Arrow heads at both ends.
+        /// 양쪽 끝에 화살표 머리.
         /// </summary>
         Both,
 
         /// <summary>
-        /// No arrow head.
+        /// 화살표 머리 없음.
         /// </summary>
         None
     }
-
+    
     public class Connection : Shape
     {
         #region feilds
-        // 내부적으로 사용하는 변수를 이렇게 선언해 두었는데, 추후 수정 여부를 결정하자.
-        // ReSharper disable once InconsistentNaming
-        private const double _baseOffset = 100d;
-        // ReSharper disable once InconsistentNaming
-        private const double _offsetGrowthRate = 25d;
-        
-        //TODO 향후 PendingConnection 만들어 줄때 사용할 것 같다.
-        public static readonly Size DefaultArrowSize = new Size(7, 6);
-        protected static readonly Vector ZeroVector = new(0d, 0d);
-        
+
+        private const double BaseOffset = 100d;
+        private const double OffsetGrowthRate = 25d;
+        private const double Degrees = Math.PI / 180.0d;
+        private static readonly Size DefaultArrowSize = new Size(7, 6);
+        private static readonly Vector ZeroVector = new(0d, 0d);
+
         #endregion
 
         #region Dependency Properties
-        // Point, Size 의 경우는 Avalonia.Point, Avalonia.Size 로 사용한다.  
+
         public static readonly StyledProperty<Point> SourceProperty =
             AvaloniaProperty.Register<Connection, Point>(nameof(Source), default(Point));
 
@@ -105,10 +110,29 @@ namespace DAGlynEditor
             AvaloniaProperty.Register<Connection, ArrowHeadEnds>(nameof(ArrowEnds), ArrowHeadEnds.End);
 
         public static readonly StyledProperty<double> SpacingProperty =
-            AvaloniaProperty.Register<Connection, double>(nameof(Spacing), 30);
+            AvaloniaProperty.Register<Connection, double>(nameof(Spacing), 30d);
 
         public static readonly StyledProperty<Size> ArrowSizeProperty =
             AvaloniaProperty.Register<Connection, Size>(nameof(ArrowSize), defaultValue: DefaultArrowSize);
+
+        // 추가.
+        public static readonly StyledProperty<LineShape> LineShapeModeProperty =
+            AvaloniaProperty.Register<Connection, LineShape>(nameof(LineShapeMode), LineShape.Line);
+
+        public static readonly StyledProperty<double> AngleProperty =
+            AvaloniaProperty.Register<Connection, double>(nameof(Angle), 45d);
+
+        public double Angle
+        {
+            get => GetValue(AngleProperty);
+            set => SetValue(AngleProperty, value);
+        }
+
+        public LineShape LineShapeMode
+        {
+            get => GetValue(LineShapeModeProperty);
+            set => SetValue(LineShapeModeProperty, value);
+        }
 
         public Point Source
         {
@@ -163,11 +187,11 @@ namespace DAGlynEditor
             get => GetValue(ArrowSizeProperty);
             set => SetValue(ArrowSizeProperty, value);
         }
+
         #endregion
 
         #region Constructors
 
-        //TODO 다른 컨스트럭터도 필요할듯.
         static Connection()
         {
             // 초기값 설정
@@ -175,11 +199,6 @@ namespace DAGlynEditor
             StrokeProperty.OverrideDefaultValue<Connection>(Brushes.Black);
             FillProperty.OverrideDefaultValue<Connection>(Brushes.Black);
 
-            // TODO 8/12/23 
-            // notion 에 일단 기록해두었지만, 향후 확장성을 생각했을때 어떻게 할지를 확인하고 결정해야 한다. TODO 로 남겨 놓는다.
-            // SpacingProperty.OverrideDefaultValue<Connection>(30);
-
-            // 속성값이 변할때 마다 렌더링이 다시 될 수 있도록 하는 코드를 작성한다.
             // AffectsGeometry
             AffectsGeometry<Connection>(
                 SourceProperty,
@@ -190,18 +209,18 @@ namespace DAGlynEditor
                 DirectionProperty,
                 ArrowHeadEndsProperty,
                 SpacingProperty,
-                ArrowSizeProperty
-                );
+                ArrowSizeProperty,
+                AngleProperty,
+                LineShapeModeProperty
+            );
         }
+
         #endregion
 
-        // 일단 Avalonia 형식으로 변환 하였음.
         protected override Geometry CreateDefiningGeometry()
         {
             var geometry = new StreamGeometry();
-
             using var context = geometry.Open();
-            // FillRule을 EvenOdd로 설정
             context.SetFillRule(FillRule.EvenOdd);
 
             // 오프셋 계산 및 소스와 타겟 점 업데이트
@@ -236,49 +255,129 @@ namespace DAGlynEditor
             return geometry;
         }
 
-        // 내부적으로 사용하는 메서드들
-
-        // DrawLineGeometry
-        // Connection.cs 에서 가져옴.
-        // Avalonia 로 수정해줘야 함.
-        // CreateDefiningGeometry 에서 사용할 예정임.
-        // 일단 테스트 용도로 public 으로 하였음.
         private void DrawLineGeometry(IGeometryContext context, Point source, Point target)
         {
             var direction = Direction == ConnectionDirection.Forward ? 1d : -1d;
             var spacing = new Vector(Spacing * direction, 0d);
             var arrowOffset = new Vector(ArrowSize.Width * direction, 0d);
-            var endPoint = Spacing > 0 ? target - arrowOffset : target;
+            var startPoint = source + spacing;
+            var endPoint = Spacing > 0d ? target - arrowOffset : target;
 
             context.BeginFigure(source, false);
-            context.LineTo(source + spacing);
-            context.LineTo(endPoint - spacing);
+
+            switch (LineShapeMode)
+            {
+                case LineShape.Line:
+                    context.LineTo(startPoint);
+                    context.LineTo(endPoint - spacing);
+                    break;
+                // TODO 여기 버그 있음.
+                case LineShape.Circuit:
+                    Point p2 = GetControlPoint(startPoint, endPoint - spacing);
+                    context.LineTo(startPoint);
+                    context.LineTo(p2);
+                    context.LineTo(endPoint - spacing);
+                    // 살펴보기
+                    //context.LineTo(target);
+                    break;
+
+                case LineShape.Quadratic:
+                    Vector delta = target - source;
+                    double height = Math.Abs(delta.Y);
+                    double width = Math.Abs(delta.X);
+
+                    double smooth = Math.Min(BaseOffset, height);
+                    double offset = Math.Max(smooth, width / 2d);
+                    offset = Math.Min(BaseOffset + Math.Sqrt(width * OffsetGrowthRate), offset);
+
+                    var controlPoint = new Vector(offset * direction, 0d);
+                    context.CubicBezierTo(startPoint + controlPoint, endPoint - controlPoint, endPoint);
+                    break;
+            }
+
             context.LineTo(endPoint);
             context.EndFigure(false);
         }
 
-        private void DrawArrowGeometry(IGeometryContext context, Point source, Point target, ConnectionDirection arrowDirection = ConnectionDirection.Forward)
+        private Point GetControlPoint(Point source, Point target)
+        {
+            Vector delta = target - source;
+            double tangent = Math.Tan(Angle * Degrees); // 각도에 따른 탄젠트 값 계산
+
+            double dx = Math.Abs(delta.X);
+            double dy = Math.Abs(delta.Y);
+
+            double slopeWidth = dy / tangent; // 수직 거리와 탄젠트를 이용해 수평 길이 계산
+            double slopeHeight = dx * tangent; // 수평 거리와 탄젠트를 이용해 수직 길이 계산
+
+            if (dx > slopeWidth)
+            {
+                // 수평 거리가 계산된 수평 길이보다 큰 경우
+                return delta.X > 0d
+                    ? new Point(target.X - slopeWidth, source.Y) // 오른쪽 방향일 경우
+                    : new Point(source.X - slopeWidth, target.Y); // 왼쪽 방향일 경우
+            }
+
+            if (dy > slopeHeight)
+            {
+                // 수직 거리가 계산된 수직 길이보다 큰 경우
+                if (delta.Y > 0d)
+                {
+                    // 위쪽 방향일 경우
+                    return delta.X < 0d
+                        ? new Point(source.X, target.Y - slopeHeight) // 왼쪽 위 방향
+                        : new Point(target.X, source.Y + slopeHeight); // 오른쪽 위 방향
+                }
+                else if (delta.X < 0d)
+                {
+                    // 아래쪽 방향일 경우 (왼쪽 아래 방향)
+                    return new Point(source.X, target.Y + slopeHeight);
+                }
+            }
+
+            // 아래쪽 방향일 경우 (오른쪽 아래 방향)
+            return new Point(target.X, source.Y - slopeHeight);
+        }
+
+        // 외부에서 만들어주는 메서드.
+        // 전체적으로 코드 정리 필요.
+        /*public void DrawConnection(Point source, Point target, double strokeThickness, IBrush color, double spacing)
+        {
+            Source = source;
+            Target = target;
+            Spacing = spacing;
+            
+            StrokeThicknessProperty.OverrideDefaultValue<Connection>(strokeThickness);
+            StrokeProperty.OverrideDefaultValue<Connection>(color);
+            FillProperty.OverrideDefaultValue<Connection>(color);
+        }*/
+
+        private void DrawArrowGeometry(IGeometryContext context, Point source, Point target,
+            ConnectionDirection arrowDirection = ConnectionDirection.Forward)
         {
             var (from, to) = GetArrowHeadPoints(source, target, arrowDirection);
 
             context.BeginFigure(target, true);
             context.LineTo(from);
             context.LineTo(to);
-            // Stroke 색상 가져오기
-            //var strokeColor = Stroke is SolidColorBrush strokeBrush ? strokeBrush.Color : Colors.Black;
 
+            // Stroke 색상 가져오기 Avalonia 에서는 필요 없음.
+            // var strokeColor = Stroke is SolidColorBrush strokeBrush ? strokeBrush.Color : Colors.Black;
             // Fill 속성에 Stroke 색상 적용
             //context.Fill(new SolidColorBrush(strokeColor));
+
             context.EndFigure(true);
         }
-        private (Point From, Point To) GetArrowHeadPoints(Point source, Point target, ConnectionDirection arrowDirection)
+
+        private (Point From, Point To) GetArrowHeadPoints(Point source, Point target,
+            ConnectionDirection arrowDirection)
         {
             var headWidth = ArrowSize.Width;
             var headHeight = ArrowSize.Height;
             Point from;
             Point to;
 
-            // Spacing이 1보다 작은 경우, 화살표의 머리 부분을 각도를 사용하여 계산합니다.
+            // Spacing이 1보다 작은 경우, 화살표의 머리 부분을 각도를 사용하여 계산.
             if (Spacing < 1d)
             {
                 var delta = source - target;
@@ -286,10 +385,12 @@ namespace DAGlynEditor
                 var sinT = Math.Sin(angle);
                 var cosT = Math.Cos(angle);
 
-                from = new Point(target.X + (headWidth * cosT - headHeight * sinT), target.Y + (headWidth * sinT + headHeight * cosT));
-                to = new Point(target.X + (headWidth * cosT + headHeight * sinT), target.Y - (headHeight * cosT - headWidth * sinT));
+                from = new Point(target.X + (headWidth * cosT - headHeight * sinT),
+                    target.Y + (headWidth * sinT + headHeight * cosT));
+                to = new Point(target.X + (headWidth * cosT + headHeight * sinT),
+                    target.Y - (headHeight * cosT - headWidth * sinT));
             }
-            // Spacing이 1보다 큰 경우, 화살표의 머리 부분을 방향에 따라 계산합니다.
+            // Spacing이 1보다 큰 경우, 화살표의 머리 부분을 방향에 따라 계산.
             else
             {
                 var direction = arrowDirection == ConnectionDirection.Forward ? 1d : -1d;
@@ -299,6 +400,7 @@ namespace DAGlynEditor
 
             return (from, to);
         }
+
         private (Vector SourceOffset, Vector TargetOffset) GetOffset()
         {
             Vector delta = Target - Source;
@@ -306,9 +408,12 @@ namespace DAGlynEditor
 
             return OffsetMode switch
             {
-                ConnectionOffsetMode.Rectangle => (GetRectangleModeOffset(delta, SourceOffset), GetRectangleModeOffset(delta2, TargetOffset)),
-                ConnectionOffsetMode.Circle => (GetCircleModeOffset(delta, SourceOffset), GetCircleModeOffset(delta2, TargetOffset)),
-                ConnectionOffsetMode.Edge => (GetEdgeModeOffset(delta, SourceOffset), GetEdgeModeOffset(delta2, TargetOffset)),
+                ConnectionOffsetMode.Rectangle => (GetRectangleModeOffset(delta, SourceOffset),
+                    GetRectangleModeOffset(delta2, TargetOffset)),
+                ConnectionOffsetMode.Circle => (GetCircleModeOffset(delta, SourceOffset),
+                    GetCircleModeOffset(delta2, TargetOffset)),
+                ConnectionOffsetMode.Edge => (GetEdgeModeOffset(delta, SourceOffset),
+                    GetEdgeModeOffset(delta2, TargetOffset)),
                 ConnectionOffsetMode.None => (ZeroVector, ZeroVector),
                 _ => throw new ArgumentOutOfRangeException()
             };
@@ -322,38 +427,26 @@ namespace DAGlynEditor
             return new Vector(xOffset, yOffset);
         }
 
-        // WPF 에서 LengthSquared 를 avalonia 에서 SquaredLength 로 변경함.
         private static Vector GetCircleModeOffset(Vector delta, Size offset)
         {
             if (delta.SquaredLength > 0d)
-            {
                 delta.Normalize();
-            }
 
             return new Vector(delta.X * offset.Width, delta.Y * offset.Height);
         }
-        // WPF 에서 LengthSquared 를 avalonia 에서 SquaredLength 로 변경함.
-        // WPF 에서 delta.LengthSquared는 벡터의 길이를 제곱한 값을 반환
-        // 세부적인 것은 확인하지 않았다. 따라서 추후 수정하면서 확인해야 한다.
+
         private static Vector GetRectangleModeOffset(Vector delta, Size offset)
         {
             if (delta.SquaredLength > 0d)
-            {
-                // WPF 에서 사용하는 Normalize() 메서드를 그대로 사용했다.
                 delta.Normalize();
-            }
 
             var angle = Math.Atan2(delta.Y, delta.X);
-            //var result = new Vector();
 
             if (offset.Width * 2d * Math.Abs(delta.Y) < offset.Height * 2d * Math.Abs(delta.X))
             {
                 var x = Math.Sign(delta.X) * offset.Width;
                 var y = Math.Tan(angle) * x;
                 return new Vector(x, y);
-
-                //result.X = Math.Sign(delta.X) * offset.Width;
-                //result.Y = Math.Tan(angle) * result.X;
             }
             else
             {
@@ -361,7 +454,6 @@ namespace DAGlynEditor
                 var x = 1.0d / Math.Tan(angle) * y;
                 return new Vector(x, y);
             }
-            //return result;
         }
     }
 }

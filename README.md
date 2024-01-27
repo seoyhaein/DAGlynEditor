@@ -35,6 +35,7 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~8/29/23 VirtualCanvas 구현 필요 및 이를 통해서 OverlayLayer 재 구현 또는 새롭게 구현.~~  
 
 ~~## 현재 DAGlynEditor 를 따로 떼어내서 구현중에 있음.~~  
+12/7/23 Connector 에서 Drag&Drop 에 대한 이벤트 이슈가 발생하였음.  
 
 ## 현재 개선해야할 부분에 대한 아이디어(그냥 막씀, 아래 문제 내용에 대한)
 ~~8/22/23 Node 에 Connector 연결~~  
@@ -97,3 +98,4 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 1. Zoom 기능 추가 구현
 2. EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)  
 - 이건 각 모니터 사이즈에 따라 달리 설정하는 설정의 문제인 거 같다. 좀 생각을 단단히 해야 할 것 같다.  
+3. Connection.cs 에서 SourceOffset, TargetOffset 관련 값의 설정에 대한 제한을 걸어야 함.
