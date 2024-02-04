@@ -1,0 +1,91 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:DAGlynEditor">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<controls:PendingConnection SourceAnchor="20,20" TargetAnchor="100,100" />
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- Add Styles Here -->
+	<Style Selector="controls|PendingConnection">
+		<Setter Property="IsHitTestVisible"
+                Value="False" />
+		<Setter Property="Background"
+                Value="#121212" />
+		<Setter Property="Foreground"
+                Value="White" />
+		<Setter Property="Stroke"
+                Value="DodgerBlue" />
+		<Setter Property="BorderBrush"
+                Value="Yellow" />
+		<Setter Property="EnablePreview"
+                Value="False" />
+		<Setter Property="StrokeThickness"
+                Value="3" />
+		<Setter Property="BorderThickness"
+                Value="1" />
+		<!-- 일단 주석처리
+        <Setter Property="Visibility"
+                Value="Hidden" /> -->
+		<!--  초기값 설정은 constructor 에서 진행.
+        <Setter Property="StrokeDashArray"
+                Value="4 4" />
+                -->
+		<Setter Property="IsVisible"
+                Value="True" />
+		<Setter Property="Padding"
+                Value="5" />
+		<Setter Property="EnableSnapping"
+                Value="True" />
+		<Setter Property="Direction"
+                Value="Forward" />
+		<Setter Property="Template">
+			<ControlTemplate TargetType="{x:Type controls:PendingConnection}">
+				<controls:TemplateLayoutCanvas x:Name="PART_Canvas" Background="Transparent">
+					<controls:Connection x:Name="PART_Connection" Source="{TemplateBinding SourceAnchor}"
+										 Target="{TemplateBinding TargetAnchor}"
+										 Stroke="{TemplateBinding Stroke}"
+										 StrokeThickness="{TemplateBinding StrokeThickness}"
+										 StrokeDashArray="{TemplateBinding StrokeDashArray}"
+										 Direction="{TemplateBinding Direction}"
+										 OffsetMode="Edge"
+										 LineShapeMode="Line"
+										 ArrowEnds="Start"
+										 Spacing="0"
+										 ArrowSize="4 4" />
+
+					<!--
+                        <Ellipse Fill="Green" Width="14" Height="14" StrokeThickness="2" 
+                                 Canvas.Left="{Binding SourceAnchor.X, RelativeSource={RelativeSource TemplatedParent}}" 
+                                 Canvas.Top="{Binding SourceAnchor.Y, RelativeSource={RelativeSource TemplatedParent}}" />
+                        -->
+					<!--<Border Background="{TemplateBinding Background}"
+                                Canvas.Left="{Binding TargetAnchor.X, RelativeSource={RelativeSource TemplatedParent}}"
+                                Canvas.Top="{Binding TargetAnchor.Y, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsVisible="{TemplateBinding EnablePreview, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                                Padding="{TemplateBinding Padding}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                CornerRadius="3"
+                                Margin="15">
+                            <ContentPresenter />
+                        </Border>-->
+					<!-- IsVisible 일단 삭제 -->
+					<!--
+                        <Border Background="{TemplateBinding Background}"
+                                Canvas.Left="{Binding TargetAnchor.X, RelativeSource={RelativeSource TemplatedParent}}"
+                                Canvas.Top="{Binding TargetAnchor.Y, RelativeSource={RelativeSource TemplatedParent}}"
+                                Padding="{TemplateBinding Padding}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                CornerRadius="3"
+                                Margin="15">
+                                <ContentPresenter />
+                        </Border>
+                        -->
+				</controls:TemplateLayoutCanvas>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>

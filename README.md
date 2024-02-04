@@ -99,3 +99,12 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 2. EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)  
 - 이건 각 모니터 사이즈에 따라 달리 설정하는 설정의 문제인 거 같다. 좀 생각을 단단히 해야 할 것 같다.  
 3. Connection.cs 에서 SourceOffset, TargetOffset 관련 값의 설정에 대한 제한을 걸어야 함.
+
+## 추가된 libs (Reactive 버전 잘 살펴야함.)
+Avalonia 11.0
+Avalonia.Desktop 11.0
+Avalonia.Diagnostics 11.0
+Avalonia.Fonts.Inter 11.0
+Avalonia.Themes.Fluent 11.0
+ReactiveUI 19.5.1
+System.Reactive 6.0
