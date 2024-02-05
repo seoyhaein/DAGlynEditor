@@ -73,7 +73,7 @@ namespace DAGlynEditor
         /// </summary>
         None
     }
-    
+
     public class Connection : Shape
     {
         #region feilds
@@ -101,10 +101,10 @@ namespace DAGlynEditor
             AvaloniaProperty.Register<Connection, Size>(nameof(TargetOffset), default(Size));
 
         public static readonly StyledProperty<ConnectionOffsetMode> OffsetModeProperty =
-            AvaloniaProperty.Register<Connection, ConnectionOffsetMode>(nameof(OffsetMode), default);
+            AvaloniaProperty.Register<Connection, ConnectionOffsetMode>(nameof(OffsetMode), ConnectionOffsetMode.None);
 
         public static readonly StyledProperty<ConnectionDirection> DirectionProperty =
-            AvaloniaProperty.Register<Connection, ConnectionDirection>(nameof(Direction), default);
+            AvaloniaProperty.Register<Connection, ConnectionDirection>(nameof(Direction), ConnectionDirection.Forward);
 
         public static readonly StyledProperty<ArrowHeadEnds> ArrowHeadEndsProperty =
             AvaloniaProperty.Register<Connection, ArrowHeadEnds>(nameof(ArrowEnds), ArrowHeadEnds.End);
@@ -196,8 +196,8 @@ namespace DAGlynEditor
         {
             // 초기값 설정
             StrokeThicknessProperty.OverrideDefaultValue<Connection>(3);
-            StrokeProperty.OverrideDefaultValue<Connection>(Brushes.Black);
-            FillProperty.OverrideDefaultValue<Connection>(Brushes.Black);
+            StrokeProperty.OverrideDefaultValue<Connection>(Brushes.DodgerBlue);
+            FillProperty.OverrideDefaultValue<Connection>(Brushes.DodgerBlue);
 
             // AffectsGeometry
             AffectsGeometry<Connection>(
