@@ -52,11 +52,11 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 
 ## 향후 개발시 참고사항(그냥 기록용으로, 향후 삭제)
 1. Toolbar 같은 경우는 AvaloniaEdit 을 한번 참고해본다.    
-2. Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만 이러면 다양한 모습을 할 수 없다라는 단점이 생김. 이 문제를 향후 처리함.  
+~~2. Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만 이러면 다양한 모습을 할 수 없다라는 단점이 생김. 이 문제를 향후 처리함.~~  
 3. AvaloniaEdit Utils 에서 ExtensionMethods 일부와 FileReader 를 가지고 왔다. 향후 수정해서 사용한다.   
 4. InputConnectorPanel 삭제 예정.  
-5. Connector 추가/삭제는 Header 설정 창에서 설정.  
-6. Connector 자체가 없어도 된다는 생각도 하고 있다. 하지만 그것은 추후 업데이트 하자. (하나로 하는 것ㅇ로 생각 변경. 계속 생각해보기)  
+~~5. Connector 추가/삭제는 Header 설정 창에서 설정.~~    
+~~6. Connector 자체가 없어도 된다는 생각도 하고 있다. 하지만 그것은 추후 업데이트 하자. (하나로 하는 것ㅇ로 생각 변경. 계속 생각해보기)~~    
 
 # DAGlynEditor
 
