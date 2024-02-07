@@ -28,18 +28,18 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~8/21/23 Connection, Connector, ItemContainer 연결 문제~~  
 ~~-- 서로 다른 좌표 영역에서 연결시켜야 하고, Connector 와 ItemContainer 는 **Connection 을 담을 수 있는 클래스가 아니다**.~~  
 ~~-- 어떻게 바인딩 시킬지 고민해야 한다. 좀 어렵다.~~  
-8/22/23 **Connector, ItemContainer, Connection 클래스가 각각 독립적으로 설계하고 싶다.** 계속 종속적으로 구현하게 되는데 이것도 어렵다.  
+~~8/22/23 **Connector, ItemContainer, Connection 클래스가 각각 독립적으로 설계하고 싶다.** 계속 종속적으로 구현하게 되는데 이것도 어렵다.~~    
 ~~8/22/23 Node 에 Connector 연결~~  
-~~-- InputConnector 추가, Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만~~ **이러면 다양한 모습을 할 수 없다라는 단점이 생김.**  
+~~-- InputConnector 추가, Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만 **이러면 다양한 모습을 할 수 없다라는 단점이 생김.**~~    
 ~~8/28/23 초기 Editor 구현~~    
 ~~8/29/23 VirtualCanvas 구현 필요 및 이를 통해서 OverlayLayer 재 구현 또는 새롭게 구현.~~  
 
 ~~## 현재 DAGlynEditor 를 따로 떼어내서 구현중에 있음.~~  
-12/7/23 Connector 에서 Drag&Drop 에 대한 이벤트 이슈가 발생하였음.  
+~~12/7/23 Connector 에서 Drag&Drop 에 대한 이벤트 이슈가 발생하였음.~~    
 
 ## 현재 개선해야할 부분에 대한 아이디어(그냥 막씀, 아래 문제 내용에 대한)
 ~~8/22/23 Node 에 Connector 연결~~  
-~~-- InputConnector 추가, Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만~~ **이러면 다양한 모습을 할 수 없다라는 단점이 생김.** 
+~~-- InputConnector 추가, Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만 **이러면 다양한 모습을 할 수 없다라는 단점이 생김.**~~   
 ```
 이 문제 같은 경우는 pending 할때는 그냥 실선으로 중앙에서 나와서 중앙으로 연결 시키는 형태로 해도 될듯하다. 
 그리고 연결이 완료 된 이후에는 connector 가 생겨서 쌓이는 형태로 가져가면 될듯하다.
@@ -83,7 +83,8 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 - Node 디자인 및 axaml 구현 -> 노드끼리 연결되는 부분 구현 -> Connection/PendingConnection 상세 구현 및 정리 (이후, 향후 개발 사항 삭제)
 - 코드 정리시 위치에 대한 규칙 정할것  
 - Node 관련 이미지 찾기 및 제작  
-- Connector 코드 정리 및 수정
+- Connector 코드 정리 및 수정  
+- IScrollSnapPointsInfo 확인하기  
 
 ## ViewPortLocation 변경 사항 설명
 ```

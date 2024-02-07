@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Reactive;
@@ -12,6 +13,17 @@ namespace DAGlynEditor
         public static IDisposable Subscribe<T>(this IObservable<T> observable, Action<T> action)
         {
             return observable.Subscribe(new AnonymousObserver<T>(action));
+        }
+
+        [Conditional("DEBUG")]
+        public static void Log(bool condition, string format, params object[] args)
+        {
+            if (condition)
+            {
+                string output = DateTime.Now.ToString("hh:MM:ss") + ": " + string.Format(format, args); //+ Environment.NewLine + Environment.StackTrace;
+                //Console.WriteLine(output);
+                Debug.WriteLine(output);
+            }
         }
 
         public static T? GetParentControlOfType<T>(this Control child) where T : Control
