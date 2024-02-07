@@ -103,6 +103,7 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 4. Location 에 대한 생각 및 구현을 구체화 해야 함. (PendingConnection 추가 및 완성 해야함. Connector 와 연관됨.)  
 5. Connector 를 일단 원형으로 구현하고 있는데, 향후 직사학형 형태로 제작하고 Input/Output 을 각각 색상을 조정할 예정임.  
 6. 리소스 통합하기 (PendingConnection.axaml 아직 추가 안됨.)
+7. 업데이트 꼭 확인하기. 놓친거 있음.
 
 ## 추가된 libs (Reactive 버전 잘 살펴야함.)
 Avalonia 11.0
