@@ -11,7 +11,7 @@ namespace DAGlynEditor
         public MainWindow()
         {
             InitializeComponent();
-            //DataContext = this;
+            DataContext = this;
         }
         
         //TODO 이부분 향후 어떻게 적용할지 고민해야 함.
@@ -40,14 +40,14 @@ namespace DAGlynEditor
             }
         };
 
-        private void Button_OnClick(object? sender, RoutedEventArgs e)
+       /* private void Button_OnClick(object? sender, RoutedEventArgs e)
         {
             var tester = this.FindControl<DAGlynEditor>("EditorTester");
             if (tester != null)
             {
                 tester.ViewportLocation = new Point(100, 200);
             }
-        }
+        }*/
     }
 
     public class MyRectInfo

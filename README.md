@@ -78,8 +78,8 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 - 컨테이너 핸들링 (드레그, 생성 삭제 등) 구현 필요. (11/15/23)
 ~~- DAGlyn 과 통합.~~  
 ~~- BoxValue.cs 삭제 예정~~    
-- State 구문 삭제 예정  
-- Gesture 관련 구문 변경 및 삭제 예정  
+- State 구문 삭제 예정 (삭제했지만 아직 업데이트 않함)  
+- Gesture 관련 구문 변경 및 삭제 예정 (삭제했지만 아직 업데이트 않함)  
 - Node 디자인 및 axaml 구현 -> 노드끼리 연결되는 부분 구현 -> Connection/PendingConnection 상세 구현 및 정리 (이후, 향후 개발 사항 삭제)
 - 코드 정리시 위치에 대한 규칙 정할것  
 - Node 관련 이미지 찾기 및 제작  
@@ -101,9 +101,9 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~- 이건 각 모니터 사이즈에 따라 달리 설정하는 설정의 문제인 거 같다. 좀 생각을 단단히 해야 할 것 같다.~~    
 3. Connection.cs 에서 SourceOffset, TargetOffset 관련 값의 설정에 대한 제한을 걸어야 함.  
 4. Location 에 대한 생각 및 구현을 구체화 해야 함. (PendingConnection 추가 및 완성 해야함. Connector 와 연관됨.)  
-5. Connector 를 일단 원형으로 구현하고 있는데, 향후 직사학형 형태로 제작하고 Input/Output 을 각각 색상을 조정할 예정임.  
+~~5. Connector 를 일단 원형으로 구현하고 있는데, 향후 직사학형 형태로 제작하고 Input/Output 을 각각 색상을 조정할 예정임.~~    
 6. 리소스 통합하기 (PendingConnection.axaml 아직 추가 안됨.)
-7. 업데이트 꼭 확인하기. 놓친거 있음.
+7. 업데이트 꼭 확인하기. 놓친거 있음. (부분적으로 업데이트 했는데 완전히 동일하게 할지 고민중)  
 
 ## 추가된 libs (Reactive 버전 잘 살펴야함.)
 Avalonia 11.0

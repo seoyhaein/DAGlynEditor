@@ -4,31 +4,33 @@
 	<Design.PreviewWith>
 		<Border Padding="20">
 			<!-- Add Controls for Previewer Here -->
+		    <controls:DAGlynEditor />
 		</Border>
 	</Design.PreviewWith>
 
 	<!-- Add Styles Here -->
 	<Style Selector="controls|DAGlynEditor">
-		<Setter Property="BorderBrush"
+        <Setter Property="BorderBrush"
                 Value="DodgerBlue" />
-		<Setter Property="Background"
+        <Setter Property="Background"
                 Value="Green" />
-		<Setter Property="BorderThickness"
+        <Setter Property="BorderThickness"
                 Value="2"/>
-		<Setter Property="Template">
-			<ControlTemplate>
-				<Border Background="{TemplateBinding Background}"
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}" >
-					<ItemsPresenter x:Name="PART_ItemsPresenter">
-						<ItemsPresenter.ItemsPanel>
-							<ItemsPanelTemplate>
-								<controls:DAGlynEditorCanvas x:Name="PART_ItemsHost" ViewportLocation="{TemplateBinding ViewportLocation}"/>
-							</ItemsPanelTemplate>
-						</ItemsPresenter.ItemsPanel>
-					</ItemsPresenter>
-				</Border>
-			</ControlTemplate >
-		</Setter>
-	</Style>
+                    <ItemsPresenter x:Name="PART_ItemsPresenter">
+                        <ItemsPresenter.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <controls:DAGlynEditorCanvas x:Name="PART_ItemsHost" Background="Transparent"  
+                                                             ViewportLocation="{TemplateBinding ViewportLocation}"/>
+                            </ItemsPanelTemplate>
+                        </ItemsPresenter.ItemsPanel>
+                    </ItemsPresenter>
+                </Border>
+            </ControlTemplate >
+        </Setter>
+    </Style>
 </Styles>

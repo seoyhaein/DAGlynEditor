@@ -4,13 +4,7 @@ using Avalonia.Controls;
 
 namespace DAGlynEditor
 {
-    // TODO 값을 설정하지 못하지 않을까?
-    // 추후 수정해야함. 일단, 에러때문에 여기다 나둠.
-    public interface ILocatable
-    {
-        Point Location { get; }
-    }
-
+   
     // 최대값을 설정해주면 된다.
     public class TemplateLayoutCanvas : Canvas
     {

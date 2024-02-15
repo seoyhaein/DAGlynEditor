@@ -89,16 +89,16 @@ namespace DAGlynEditor
         #region Dependency Properties
 
         public static readonly StyledProperty<Point> SourceProperty =
-            AvaloniaProperty.Register<Connection, Point>(nameof(Source), default(Point));
+            AvaloniaProperty.Register<Connection, Point>(nameof(Source));
 
         public static readonly StyledProperty<Point> TargetProperty =
-            AvaloniaProperty.Register<Connection, Point>(nameof(Target), default(Point));
+            AvaloniaProperty.Register<Connection, Point>(nameof(Target));
 
         public static readonly StyledProperty<Size> SourceOffsetProperty =
-            AvaloniaProperty.Register<Connection, Size>(nameof(SourceOffset), default(Size));
+            AvaloniaProperty.Register<Connection, Size>(nameof(SourceOffset));
 
         public static readonly StyledProperty<Size> TargetOffsetProperty =
-            AvaloniaProperty.Register<Connection, Size>(nameof(TargetOffset), default(Size));
+            AvaloniaProperty.Register<Connection, Size>(nameof(TargetOffset));
 
         public static readonly StyledProperty<ConnectionOffsetMode> OffsetModeProperty =
             AvaloniaProperty.Register<Connection, ConnectionOffsetMode>(nameof(OffsetMode), ConnectionOffsetMode.None);
@@ -115,7 +115,6 @@ namespace DAGlynEditor
         public static readonly StyledProperty<Size> ArrowSizeProperty =
             AvaloniaProperty.Register<Connection, Size>(nameof(ArrowSize), defaultValue: DefaultArrowSize);
 
-        // 추가.
         public static readonly StyledProperty<LineShape> LineShapeModeProperty =
             AvaloniaProperty.Register<Connection, LineShape>(nameof(LineShapeMode), LineShape.Line);
 
@@ -217,43 +216,7 @@ namespace DAGlynEditor
 
         #endregion
 
-        protected override Geometry CreateDefiningGeometry()
-        {
-            var geometry = new StreamGeometry();
-            using var context = geometry.Open();
-            context.SetFillRule(FillRule.EvenOdd);
-
-            // 오프셋 계산 및 소스와 타겟 점 업데이트
-            var (sourceOffset, targetOffset) = GetOffset();
-            var source = Source + sourceOffset;
-            var target = Target + targetOffset;
-
-            // 선 그리기
-            DrawLineGeometry(context, source, target);
-
-            // 화살표 그리기 (화살표 크기가 0이 아닌 경우) None, Default 는 생략했음.
-            if (ArrowSize.Width != 0d && ArrowSize.Height != 0d)
-            {
-                switch (ArrowEnds)
-                {
-                    case ArrowHeadEnds.Start:
-                        DrawArrowGeometry(context, source, target, ConnectionDirection.Backward);
-
-                        break;
-                    case ArrowHeadEnds.End:
-                        DrawArrowGeometry(context, source, target, ConnectionDirection.Forward);
-
-                        break;
-                    case ArrowHeadEnds.Both:
-                        DrawArrowGeometry(context, source, target, ConnectionDirection.Forward);
-                        DrawArrowGeometry(context, target, source, ConnectionDirection.Backward);
-
-                        break;
-                }
-            }
-
-            return geometry;
-        }
+        #region Methods
 
         private void DrawLineGeometry(IGeometryContext context, Point source, Point target)
         {
@@ -454,6 +417,47 @@ namespace DAGlynEditor
                 var x = 1.0d / Math.Tan(angle) * y;
                 return new Vector(x, y);
             }
+        }
+
+        #endregion
+
+        /// <inheritdoc />
+        protected override Geometry CreateDefiningGeometry()
+        {
+            var geometry = new StreamGeometry();
+            using var context = geometry.Open();
+            context.SetFillRule(FillRule.EvenOdd);
+
+            // 오프셋 계산 및 소스와 타겟 점 업데이트
+            var (sourceOffset, targetOffset) = GetOffset();
+            var source = Source + sourceOffset;
+            var target = Target + targetOffset;
+
+            // 선 그리기
+            DrawLineGeometry(context, source, target);
+
+            // 화살표 그리기 (화살표 크기가 0이 아닌 경우) None, Default 는 생략했음.
+            if (ArrowSize.Width != 0d && ArrowSize.Height != 0d)
+            {
+                switch (ArrowEnds)
+                {
+                    case ArrowHeadEnds.Start:
+                        DrawArrowGeometry(context, source, target, ConnectionDirection.Backward);
+
+                        break;
+                    case ArrowHeadEnds.End:
+                        DrawArrowGeometry(context, source, target, ConnectionDirection.Forward);
+
+                        break;
+                    case ArrowHeadEnds.Both:
+                        DrawArrowGeometry(context, source, target, ConnectionDirection.Forward);
+                        DrawArrowGeometry(context, target, source, ConnectionDirection.Backward);
+
+                        break;
+                }
+            }
+
+            return geometry;
         }
     }
 }

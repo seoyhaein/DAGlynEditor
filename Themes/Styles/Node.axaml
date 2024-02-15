@@ -7,155 +7,46 @@
 		<controls:Node />
 	</Design.PreviewWith>
 
-	<Style Selector="controls|Node">
-		<!-- 향후 삭제하는 방향으로 생각하자. -->
-		<Style.Resources>
-			<DataTemplate x:Key="DefaultInputConnectorTemplate">
-				<controls:InConnector />
-			</DataTemplate>
 
-			<LinearGradientBrush x:Key="FadeOpacityMask"
-								 StartPoint="0,0"
-								 EndPoint="1,0">
-				<GradientStop Color="#22FFFFFF" Offset="0" />
-				<GradientStop Color="#88FFFFFF" Offset="0.3" />
-				<GradientStop Color="#88FFFFFF" Offset="0.7" />
-				<GradientStop Color="#22FFFFFF" Offset="1" />
-			</LinearGradientBrush>
-		</Style.Resources>
-		<Setter Property="Background"
-                Value="#662D2D30"/>
-		<Setter Property="BorderThickness"
-                Value="3" />
-		<Setter Property="Padding"
-                Value="3" />
-		<Setter Property="ContentBrush"
-                Value="#662D2D30" />
-		<Setter Property="HeaderBrush"
-                Value="#661E1E1E" />
-		<Setter Property="FooterBrush"
-                Value="#661E1E1E" />
-		<Setter Property="Foreground"
-                Value="White" />
-		<Setter Property="BorderBrush"
-                Value="Transparent" />
-		<Setter Property="MinHeight"
-                Value="15" />
-		<Setter Property="MinWidth"
-                Value="15" />
-		<Setter Property="VerticalAlignment"
-                Value="Center" />
-		<Setter Property="HorizontalAlignment"
-                Value="Center" />
-		<Setter Property="VerticalContentAlignment"
-                Value="Center" />
-		<Setter Property="HorizontalContentAlignment"
-                Value="Center" />
-		<Setter Property="InputConnectorTemplate"
-                Value="{StaticResource DefaultInputConnectorTemplate}" />
+	<Style Selector="controls|Node">
 		<Setter Property="Template">
 			<ControlTemplate>
-				<Border Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        Padding="{TemplateBinding Padding}"
-                        CornerRadius="3">
-					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto" />
-							<RowDefinition Height="*" />
-							<RowDefinition Height="Auto" />
-						</Grid.RowDefinitions>
-						<!--디자인에 대해서는 추후 수정한다.-->
-						<!--Header-->
-						<Border
-								BorderBrush="{TemplateBinding HeaderBrush}"
-								CornerRadius="3 3 0 0"
-								BorderThickness="1"
-								Grid.ColumnSpan="3"
-								Padding="6 4 6 4">
-							<ContentPresenter Content="{TemplateBinding Header}"
-											  ContentTemplate="{TemplateBinding HeaderTemplate}" />
-						</Border>
-
-						<!--Body-->
-						<Grid Grid.Row="1">
+				<Grid>
+					<!-- 노드의 전체 컨테이너 -->
+					<!--w / h 는 일단 이렇게 정해 놓는다.-->
+					<!--양쪽 부분은 전체 사이즈의 1/15 w 사이즈로 한다.-->
+					<Border Width="200" Height="124"
+                            Background="#1c1b2b"
+                            CornerRadius="2"
+                            BorderBrush="#1c1b2b"
+                            BorderThickness="1">
+						<Grid>
+							<!-- 좌우 구획을 위한 컬럼 정의 -->
 							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto" />
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="Auto" />
+								<ColumnDefinition Width="1*" />
+								<ColumnDefinition Width="13*" />
+								<ColumnDefinition Width="1*" />
 							</Grid.ColumnDefinitions>
+							<!-- 일단 값은 직접 넣는다. 향후 따로 뺀다. -->
+							<!-- 구획 사이의 구분선 -->
+							<Rectangle Grid.Column="1" Fill="Black" />
 
-							<!--Data IN-->
-							<!--
-                                <ItemsControl ItemsSource="{TemplateBinding Input}"
-                                              ItemTemplate="{TemplateBinding InputConnectorTemplate}"
-                                              Focusable="False" />
-                                -->
+							<!-- 왼쪽 구획 -->
+							<Rectangle Grid.Column="0" Fill="#4d4d4d"/>
+							<!--<StackPanel Grid.Column="0">
+                                <TextBlock Text="Left Node" Foreground="WhiteSmoke" Margin="5" />
+                                ~1~ 왼쪽 포트들을 추가할 수 있음 @1@
+                            </StackPanel>-->
 
-							<ItemsControl ItemsSource="{TemplateBinding Input}"
-										  Focusable="False" >
-								<ItemsControl.ItemTemplate>
-									<DataTemplate>
-										<Grid >
-											<Border IsVisible="True"
-													OpacityMask="{StaticResource FadeOpacityMask}"
-													Background="{TemplateBinding BorderBrush}"
-													BorderThickness="1"
-													BorderBrush="Red"/>
-											<StackPanel Orientation="Horizontal"
-														Margin="4 2">
-												<controls:InConnector />
-											</StackPanel>
-										</Grid>
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
-
-							</ItemsControl>
-
-							<!--Content-->
-							<Border Grid.Column="1"
-									Padding="16 0 16 0">
-								<ContentPresenter Content="Content"
-												  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-												  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
-							</Border>
-
-							<!--Data OUT-->
-							<!-- HorizontalContentAlignment="Right" 없음. -->
-							<!-- Border  x:Name="PART_Highlight" 삭제. -->
-							<ItemsControl ItemsSource="{TemplateBinding Output}"
-										  Grid.Column="2"
-										  Focusable="False" >
-								<ItemsControl.ItemTemplate>
-									<DataTemplate>
-										<Grid>
-											<Border IsVisible="True"
-													BorderThickness="1"
-													BorderBrush="Red"/>
-											<StackPanel Orientation="Horizontal"
-														Margin="4 2">
-												<controls:OutConnector />
-											</StackPanel>
-										</Grid>
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
-							</ItemsControl>
-
+							<!-- 오른쪽 구획 -->
+							<Rectangle Grid.Column="2" Fill="#2e2e2e"/>
+							<!--<StackPanel Grid.Column="2">
+                                <TextBlock Text="Right Node" Foreground="WhiteSmoke" Margin="5"/>
+                                ~1~ 오른쪽 포트들을 추가할 수 있음 @1@
+                            </StackPanel>-->
 						</Grid>
-						<!--디자인에 대해서는 추후 수정한다.-->
-						<!--Footer-->
-						<Border BorderBrush="{TemplateBinding FooterBrush}"
-								CornerRadius="0 0 3 3"
-								Grid.Row="2"
-								Grid.ColumnSpan="3"
-								BorderThickness="1"
-								Padding="6 4 6 4">
-							<ContentPresenter Content="{TemplateBinding Footer}"
-											  ContentTemplate="{TemplateBinding FooterTemplate}" />
-						</Border>
-					</Grid>
-				</Border>
+					</Border>
+				</Grid>
 			</ControlTemplate>
 		</Setter>
 	</Style>

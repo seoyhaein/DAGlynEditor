@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 using System;
 using System.Diagnostics;
 using System.Reactive.Disposables;
@@ -9,12 +10,18 @@ using System.Reactive.Linq;
 namespace DAGlynEditor
 {
     /*
-  * OutConnector 의 경우는 line 이 나가는 Connector 임, 즉 Source 임.
-  * 
-  */
+     * OutConnector 의 경우는 line 이 나가는 Connector 임, 즉 Source 임.
+     * 
+     */
+
+    /// <summary>
+    /// HandlePointerMoved
+    /// 지금 Canvas 로 잡았는데, 이부분은 수정해야함.
+    /// 공통된 부분 깔끔하게 정리해야함. 
+    /// </summary>
 
     // TODO 코드 정리 필요. 
-    public class OutConnector : Connector
+    public sealed class OutConnector : Connector
     {
         protected override Type StyleKeyOverride => typeof(Connector);
 
@@ -22,17 +29,23 @@ namespace DAGlynEditor
 
         static OutConnector()
         {
-            FocusableProperty.OverrideDefaultValue<OutConnector>(true);
+            // TODO 향후 이거 주석처리한다.
+            // UI 바꿀때, Background 속성 변경. 그냥 Background 를 받아서 할까 아니면 지금처럼 Fill 을 만들어 줄까????
+            //BackgroundProperty.OverrideDefaultValue<OutConnector>(new SolidColorBrush(Color.Parse("#4d4d4d")));
+            //FocusableProperty.OverrideDefaultValue<OutConnector>(true);
+            FillProperty.OverrideDefaultValue<OutConnector>(new SolidColorBrush(Color.Parse("#2e2e2e")));
         }
 
         #endregion
 
-        #region Fields & Dependency Properties
+        #region Fields
 
         // Connector 밖으로 한번이라도 나가면 true 가 된다.
         private bool _outSideOutConnector = false;
 
         #endregion
+
+        #region Evnet Handlers
 
         protected override void HandlePointerPressed(object? sender, PointerPressedEventArgs args)
         {
@@ -104,7 +117,6 @@ namespace DAGlynEditor
                     Debug.Print("다른 Connector 에 들어 갔다가 다시 자신으로 돌아온 경우");
             }
 
-            // TODO 이거 필요한지 생각하자.
             args.Handled = true;
         }
 
@@ -144,5 +156,8 @@ namespace DAGlynEditor
                 }
             }
         }
+
+        #endregion
+
     }
 }

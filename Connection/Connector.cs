@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Avalonia.Media;
 
 namespace DAGlynEditor
 {
@@ -20,6 +21,9 @@ namespace DAGlynEditor
         public Connector()
         {
             InitializeSubscriptions();
+
+            // TODO axaml 에서 생성한 경우 Dispose 할 수 없는데 이렇게 하면 될까?
+            this.Unloaded += (sender, e) => this.Dispose();
         }
 
         /*static Connector()
@@ -75,11 +79,23 @@ namespace DAGlynEditor
             set => SetValue(AnchorProperty, value);
         }
 
+        // 추가
+        public static readonly StyledProperty<IBrush?> FillProperty =
+            AvaloniaProperty.Register<Connector, IBrush?>(nameof(Fill));
+
+        public IBrush? Fill
+        {
+            get => GetValue(FillProperty);
+            set => SetValue(FillProperty, value);
+        }
+
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
         protected bool IsPointerPressed;
         protected Connector? PreviousConnector;
 
         #endregion
+
+        #region Event Handlers
 
         private void InitializeSubscriptions()
         {
@@ -102,9 +118,17 @@ namespace DAGlynEditor
                 .DisposeWith(_disposables);
         }
 
-        protected virtual void HandlePointerPressed(object? sender, PointerPressedEventArgs args) { }
-        protected virtual void HandlePointerMoved(object? sender, PointerEventArgs args) { }
-        protected virtual void HandlePointerReleased(object? sender, PointerReleasedEventArgs args) { }
+        protected virtual void HandlePointerPressed(object? sender, PointerPressedEventArgs args)
+        {
+        }
+
+        protected virtual void HandlePointerMoved(object? sender, PointerEventArgs args)
+        {
+        }
+
+        protected virtual void HandlePointerReleased(object? sender, PointerReleasedEventArgs args)
+        {
+        }
 
         // DataContext 는 살펴보자.
         /*private void StartedRaiseEvent(object? sender)
@@ -144,9 +168,32 @@ namespace DAGlynEditor
             RaiseEvent(args);
         }*/
 
+        #endregion
+
+        #region Methods
+
         public void Dispose()
         {
-            _disposables?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this); // 종료자 호출 억제
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // 관리되는 자원 해제
+                _disposables.Dispose();
+            }
+            // 관리되지 않는 자원 해제 코드가 필요한 경우 여기에 추가
+        }
+
+        // 종료자
+        ~Connector()
+        {
+            Dispose(false);
+        }
+
+        #endregion
     }
 }
