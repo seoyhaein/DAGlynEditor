@@ -1,8 +1,8 @@
-# DAGlyn
-DAGlyn: Avalonia 기반의 고급 에디터로, 방향성 비순환 그래프(DAG)를 활용해 데이터 흐름을 디자인하고 시각화합니다. 
+# DAGlynEditor
+DAGlynEditor: Avalonia 기반의 고급 에디터로, 방향성 비순환 그래프(DAG)를 활용해 데이터 흐름을 디자인하고 시각화합니다. 
 직관적인 노드 기반 GUI 상호작용에 최적화되어 효율적인 데이터 처리 워크플로우를 제공합니다.  
 
-DAGlyn: An advanced editor based on Avalonia, designed to visualize and design data flows using Directed Acyclic Graphs (DAG).   
+DAGlynEditor: An advanced editor based on Avalonia, designed to visualize and design data flows using Directed Acyclic Graphs (DAG).   
 It's optimized for intuitive node-based GUI interactions, providing an efficient data processing workflow.  
 
 ## 현재 발생 문제점 및 개발 진행 사항
@@ -33,9 +33,44 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~-- InputConnector 추가, Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만 **이러면 다양한 모습을 할 수 없다라는 단점이 생김.**~~    
 ~~8/28/23 초기 Editor 구현~~    
 ~~8/29/23 VirtualCanvas 구현 필요 및 이를 통해서 OverlayLayer 재 구현 또는 새롭게 구현.~~  
-
 ~~## 현재 DAGlynEditor 를 따로 떼어내서 구현중에 있음.~~  
 ~~12/7/23 Connector 에서 Drag&Drop 에 대한 이벤트 이슈가 발생하였음.~~    
+~~- OverlayLayer 로 Canvas 구현하였음.~~     
+- ItemsControl 연결 해서 위치 정확히 렌더링 되는지 확인 필요.  
+- 테스트 코드 삭제 필요 및 추가 기능 구현 세부화 할 필요 있음.  
+~~- ViewPort 구현해야함.~~    
+~~- Panning 구현 진행중 (10-18-23)~~  
+~~- Paning 관련 버그 발견. 해결하지 못함. (10-24-23)~~    
+~~- RX 방식으로 이벤트 처리 필요  (바로 시작. 전통적인 방식하니 잘 안됨.)~~  
+~~- 마우스에 따라 Paning 기능 추가 구현 중 (10-22-23)~~    
+~~- Animation 구현 (10-19-23)~~  
+~~- EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)~~        
+~~- Zoom 기능 추가 구현 필요.~~    
+~~- MultiGesture 기능 구현 11/4/23~~    
+~~- State 패턴 적용 및 관련 이벤트 적용, MultiGesture 기능 구현 이후. 이때 Zoom, Paning 기능 추가 및 확인. (11/7/23)~~   
+~~- Container 구현 및 Container 에 Node 연결, 그리고, 이때 작업을 편안하게 해주는 API 구현(11/13/23)~~  (다른 방안을 찾음.)
+~~- 컨테이너 핸들링 (드레그, 생성 삭제 등) 구현 필요. (11/15/23)~~  
+~~- DAGlyn 과 통합.~~  
+~~- BoxValue.cs 삭제 예정~~    
+- State 구문 삭제 예정 (삭제했지만 아직 업데이트 않함)  
+- Gesture 관련 구문 변경 및 삭제 예정 (삭제했지만 아직 업데이트 않함)  
+~~- 코드 정리시 위치에 대한 규칙 정할것~~    
+~~- Node 관련 이미지 찾기 및 제작 (1차 완료, 업데이트전)~~    
+- Connector 코드 정리 및 수정  
+~~- IScrollSnapPointsInfo 확인하기~~    
+~~- 좌표 체계가 혼동스러움. 일단 이거 정리하자.~~
+~~- Connector 구현 하기~~  
+- 새로운 UI 구현.  
+- Connector 테스트 하기, Dispose 관련해서 테스트 진행하기.  
+- Connector 구현 후 PendingConnection 완성.  
+~~- Node UI 초기 설계, Node 이동 구현 필요.(NodeEditor 확인)~~  
+- Node 이동 시 최종적인 위치 변경은 위치 변경 후 Invallid~ 호출 그리고 데이터 저장해야 함. 이 구현은 거의 마지막에 이루어 질듯.   
+~~- Panning 구현 다시 정리하기.(DAGlynEditor 구현 및 정리)~~   
+~~- Panning 관련하여 Canvas 의 사이즈가 고정되서 움직여서 이것에 대한 버그가 발생한다. 이것을 해결해야 한다.~~  
+- DirectProperty 좀더 연구.  
+- Nodify 에서 Node 추가하는 소스 코드 한번 살펴본다.  
+- Connector 연결 구현, 이동에 따른 연결점(Anchor) 의 업데이트 구현, PendingConnection 및 연결 완료되었을때 연결선 구현 
+- Node 디자인 및 axaml 구현 -> 노드끼리 연결되는 부분 구현 -> Connection/PendingConnection 상세 구현 및 정리 (이후, 향후 개발 사항 삭제)
 
 ## 현재 개선해야할 부분에 대한 아이디어(그냥 막씀, 아래 문제 내용에 대한)
 ~~8/22/23 Node 에 Connector 연결~~  
@@ -53,47 +88,11 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ## 향후 개발시 참고사항(그냥 기록용으로, 향후 삭제)
 1. Toolbar 같은 경우는 AvaloniaEdit 을 한번 참고해본다.    
 ~~2. Connector 의 axaml 없애버리고, InputConnector 로 대체. 하지만 이러면 다양한 모습을 할 수 없다라는 단점이 생김. 이 문제를 향후 처리함.~~  
-3. AvaloniaEdit Utils 에서 ExtensionMethods 일부와 FileReader 를 가지고 왔다. 향후 수정해서 사용한다.   
-4. InputConnectorPanel 삭제 예정.  
+~~3. AvaloniaEdit Utils 에서 ExtensionMethods 일부와 FileReader 를 가지고 왔다. 향후 수정해서 사용한다.~~     
+~~4. InputConnectorPanel 삭제 예정.~~    
 ~~5. Connector 추가/삭제는 Header 설정 창에서 설정.~~    
 ~~6. Connector 자체가 없어도 된다는 생각도 하고 있다. 하지만 그것은 추후 업데이트 하자. (하나로 하는 것ㅇ로 생각 변경. 계속 생각해보기)~~    
 
-# DAGlynEditor
-
-## 진행 사항 (잠시 commit 중단. Node 디자인 적용 후 커밋)
-~~- OverlayLayer 로 Canvas 구현하였음.~~     
-- ItemsControl 연결 해서 위치 정확히 렌더링 되는지 확인 필요.  
-- 테스트 코드 삭제 필요 및 추가 기능 구현 세부화 할 필요 있음.  
-~~- ViewPort 구현해야함.~~    
-~~- Panning 구현 진행중 (10-18-23)~~  
-~~- Paning 관련 버그 발견. 해결하지 못함. (10-24-23)~~    
-~~- RX 방식으로 이벤트 처리 필요  (바로 시작. 전통적인 방식하니 잘 안됨.)~~  
-~~- 마우스에 따라 Paning 기능 추가 구현 중 (10-22-23)~~    
-~~- Animation 구현 (10-19-23)~~  
-- EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)      
-~~- Zoom 기능 추가 구현 필요.~~    
-~~- MultiGesture 기능 구현 11/4/23~~    
-~~- State 패턴 적용 및 관련 이벤트 적용, MultiGesture 기능 구현 이후. 이때 Zoom, Paning 기능 추가 및 확인. (11/7/23)~~   
-~~- Container 구현 및 Container 에 Node 연결, 그리고, 이때 작업을 편안하게 해주는 API 구현(11/13/23)~~  (다른 방안을 찾음.)
-- 컨테이너 핸들링 (드레그, 생성 삭제 등) 구현 필요. (11/15/23)
-~~- DAGlyn 과 통합.~~  
-~~- BoxValue.cs 삭제 예정~~    
-- State 구문 삭제 예정 (삭제했지만 아직 업데이트 않함)  
-- Gesture 관련 구문 변경 및 삭제 예정 (삭제했지만 아직 업데이트 않함)  
-- Node 디자인 및 axaml 구현 -> 노드끼리 연결되는 부분 구현 -> Connection/PendingConnection 상세 구현 및 정리 (이후, 향후 개발 사항 삭제)
-- 코드 정리시 위치에 대한 규칙 정할것  
-- Node 관련 이미지 찾기 및 제작  
-- Connector 코드 정리 및 수정  
-- IScrollSnapPointsInfo 확인하기  
-
-## ViewPortLocation 변경 사항 설명
-```
-마우스 포인터와 관련해서 원본소스에서는 마우스 포인터의 위치를 안에 있는 Panel 로 잡았다. 이걸 다시 상위 Canvas 로 넘겨주는 방식?? 인데
-
-생각을 좀더 해보자. 데이터가 위치할 패널에서 위치를 잡는게 맞는거 같기도 하다.
-```
-## 미룬 것들 (머리 안써도 되는 것들은 집중안될때 처리)
-1. MultiGetsture 테스트 코드 작성 (State 프로젝트 참고) -> 필요 없으면 삭제 예정.  
 
 ## 미룬 것들 (머리 써야 하는 것들) TODO 확인 필요.    
 1. Zoom 기능 추가 구현
