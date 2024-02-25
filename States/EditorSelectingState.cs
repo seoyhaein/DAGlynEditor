@@ -54,18 +54,18 @@ public class EditorSelectingState : EditorState
     /// <inheritdoc />
     public override void HandlePointerPressed(PointerPressedEventArgs e)
     {
-        if (e.Source == null) return;
+       /* if (e.Source == null) return;
 
         if (!Editor.DisablePanning && EditorGestures.PanningStarted.Matches(e.Source, e))
         {
             PushState(new EditorPanningState(Editor));
-        }
+        }*/
     }
     // TODO 여기서는 Cancel 을 다시 정의해야함. 일단 true 로 세팅해둠.
     /// <inheritdoc />
     public override void HandlePointerReleased(PointerReleasedEventArgs e)
     {
-        if (e.Source == null) return;
+      /*  if (e.Source == null) return;
         //bool canCancel = EditorGestures.Selection.Cancel.Matches(e);
         bool canCancel = true;
         bool canComplete = EditorGestures.Select.Matches(e.Source, e);
@@ -73,7 +73,7 @@ public class EditorSelectingState : EditorState
         {
             _canceled = !canComplete && canCancel;
             PopState();
-        }
+        }*/
     }
     // TODO AutoPanning 을 사용하지 않을 예정임. 일단 체크하기 위해서.
     /// <inheritdoc />
@@ -83,10 +83,10 @@ public class EditorSelectingState : EditorState
     public override void HandleKeyUp(KeyEventArgs e)
     {
         //if (e.Source == null) return;
-        if (EditorGestures.Selection.Cancel.Matches(e))
+        /*if (EditorGestures.Selection.Cancel.Matches(e))
         {
             _canceled = true;
             PopState();
-        }
+        }*/
     }
 }

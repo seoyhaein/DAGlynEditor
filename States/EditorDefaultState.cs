@@ -11,7 +11,7 @@ namespace DAGlynEditor
 
         public override void HandlePointerPressed(PointerPressedEventArgs e)
         {
-            if (e.Source == null) return;
+/*            if (e.Source == null) return;
 
             // EditorGestures.Select와 매치되는 경우
             if (EditorGestures.Select.Matches(e.Source, e))
@@ -24,7 +24,7 @@ namespace DAGlynEditor
             else if (!Editor.DisablePanning && EditorGestures.PanningStarted.Matches(e.Source, e))
             {
                 PushState(new EditorPanningState(Editor));
-            }
+            }*/
         }
 
         private static SelectionType? GetSelectionType(PointerEventArgs e)

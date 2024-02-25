@@ -3,6 +3,8 @@ using Avalonia.Input;
 
 namespace DAGlynEditor;
 
+// 이 클래스는 사용하지 않을 예정임.
+// 소스 수정에 따른 오류발생하는데, 이 클래스를 주석 처리함.
 public class EditorPanningState : EditorState
 {
     private Point _initialMousePosition;
@@ -41,7 +43,7 @@ public class EditorPanningState : EditorState
     /// <inheritdoc />
     public override void HandlePointerReleased(PointerReleasedEventArgs e)
     {
-        if (e.Source == null) return;
+        /*if (e.Source == null) return;
         if (EditorGestures.PanningEnded.Matches(e.Source, e))
         {
             double contextMenuTreshold = DAGlynEditor.HandleRightClickAfterPanningThreshold * DAGlynEditor.HandleRightClickAfterPanningThreshold;
@@ -61,6 +63,6 @@ public class EditorPanningState : EditorState
                 PopState();
                 PushState(new EditorPanningState(Editor));
             }
-        }
+        }*/
     }
 }

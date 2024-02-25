@@ -2,6 +2,8 @@
 
 namespace DAGlynEditor
 {
+    // 이 클래스는 사용하지 않을 예정임.
+    // 에러나는 부분은 일단 주석 처리함.
     public abstract class EditorState
     {
         public EditorState(DAGlynEditor editor)
@@ -41,9 +43,9 @@ namespace DAGlynEditor
         // 아래는 일단 주석처리 함.
         /// <summary>Pushes a new state into the stack.</summary>
         /// <param name="newState">The new state.</param>
-        public virtual void PushState(EditorState newState) => Editor.PushState(newState);
+        //public virtual void PushState(EditorState newState) => Editor.PushState(newState);
 
         /// <summary>Pops the current state from the stack.</summary>
-        public virtual void PopState() => Editor.PopState();
+        //public virtual void PopState() => Editor.PopState();
     }
 }

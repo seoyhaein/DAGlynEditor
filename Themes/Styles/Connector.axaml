@@ -4,6 +4,7 @@
 	<Design.PreviewWith>
 		<Border Padding="20">
 			<!-- Add Controls for Previewer Here -->
+			<controls:Connector />
 		</Border>
 	</Design.PreviewWith>
 
@@ -19,14 +20,16 @@
                 Value="14" />
 		<Setter Property="Height"
                 Value="14" />
+		<Setter Property="Fill"
+                Value="#4d4d4d"/>
 		<Setter Property="Template">
 			<ControlTemplate>
 				<Grid>
-					<Ellipse
+					<Rectangle
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
                         Stroke="{TemplateBinding BorderBrush}"
-                        Fill="Transparent"
+                        Fill="{TemplateBinding Fill}"
                         StrokeThickness="2" />
 				</Grid>
 			</ControlTemplate >

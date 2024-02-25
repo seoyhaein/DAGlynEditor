@@ -1,15 +1,17 @@
-﻿using Avalonia.Controls.Primitives;
+﻿using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 
 namespace DAGlynEditor
 {
-    public class DAGlynEditorCanvas : OverlayLayer
+    public sealed class DAGlynEditorCanvas : Canvas, IDisposable
     {
-        #region ViewportLocation 화면이동.
+        #region Dependency Properties
 
         public static readonly StyledProperty<Point> ViewportLocationProperty =
-            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(nameof(ViewportLocation), default(Point));
+            AvaloniaProperty.Register<DAGlynEditorCanvas, Point>(
+                nameof(ViewportLocation), Constants.ZeroPoint);
 
         public Point ViewportLocation
         {
@@ -19,11 +21,58 @@ namespace DAGlynEditor
 
         #endregion
 
+        #region Fields
+
+        private readonly IDisposable _disposable;
+
+        #endregion
+
+        #region Constructor
+
         public DAGlynEditorCanvas()
         {
             RenderTransform = new TranslateTransform();
-            this.GetPropertyChangedObservable(ViewportLocationProperty).Subscribe(OnViewportLocationChanged);
+            _disposable = ViewportLocationProperty.Changed.Subscribe(OnViewportLocationChanged);
         }
+
+        #endregion
+
+        //TODO 사이즈에 대한 것은 디버깅해서 살펴보자.
+        /// <inheritdoc />
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            foreach (var child in Children)
+            {
+                // ILocatable 인터페이스를 구현하는지 확인
+                if (child is ILocatable locatableChild)
+                {
+                    Point location = locatableChild.Location;
+                    child.Arrange(new Rect(location, child.DesiredSize));
+                }
+                else
+                {
+                    // ILocatable을 구현하지 않는 경우, 기본 위치나 다른 로직을 사용하여 Arrange를 수행
+                    // 기본 위치를 (0, 0)으로 설정
+                    child.Arrange(new Rect(0, 0, child.DesiredSize.Width, child.DesiredSize.Height));
+                }
+            }
+
+            // TODO finalSize 한번 디버깅해서 봐야 한다.
+            return finalSize;
+        }
+
+        /// <inheritdoc />
+        protected override Size MeasureOverride(Size constraint)
+        {
+            foreach (var child in Children)
+            {
+                child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            }
+
+            return default;
+        }
+
+        #region Methods
 
         private void OnViewportLocationChanged(AvaloniaPropertyChangedEventArgs e)
         {
@@ -37,34 +86,12 @@ namespace DAGlynEditor
             }
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
+        public void Dispose()
         {
-            var children = Children;
-
-            foreach (var child in children)
-            {
-                var locationProperty = child.GetType().GetProperty("Location");
-                if (locationProperty != null)
-                {
-                    var locationValue = locationProperty.GetValue(child);
-                    if (locationValue is Point location)
-                    {
-                        child.Arrange(new Rect(location, child.DesiredSize));
-                    }
-                }
-            }
-
-            return finalSize;
+            // 관리되는 자원 해제
+            _disposable.Dispose();
         }
 
-        protected override Size MeasureOverride(Size constraint)
-        {
-            foreach (var child in Children)
-            {
-                child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            }
-
-            return default;
-        }
+        #endregion
     }
 }

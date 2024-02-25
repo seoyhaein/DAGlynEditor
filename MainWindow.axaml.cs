@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -11,50 +12,56 @@ namespace DAGlynEditor
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = this;
-        }
-        
-        //TODO 이부분 향후 어떻게 적용할지 고민해야 함.
-        public ObservableCollection<MyRectInfo> MyItems { get; set; } = new ObservableCollection<MyRectInfo>
-        {
-            new MyRectInfo
-            {
-                Location = new Point(0, 0),
-                W = 100,
-                H = 100,
-                Br = Brushes.Red
-            },
-            new MyRectInfo
-            {
-                Location = new Point(200, 200),
-                W = 150,
-                H = 150,
-                Br = Brushes.Blue
-            },
-            new MyRectInfo
-            {
-                Location = new Point(-200, -200),
-                W = 150,
-                H = 150,
-                Br = Brushes.Yellow
-            }
-        };
 
-       /* private void Button_OnClick(object? sender, RoutedEventArgs e)
+            // for test
+            /*_pendingConnection = new PendingConnection();
+            _pendingConnection.IsVisible = true; // 초기 가시성 설정
+            _pendingConnection.SourceAnchor = new Point(10, 10);
+            _pendingConnection.TargetAnchor = new Point(200, 200);
+
+            MainCanvas.Children.Add(_pendingConnection);*/
+
+            DataContext = this;
+            // 이벤트 적용되지 않음.
+            // EditorTester.Dispose();
+        }
+
+        public AvaloniaList<TestConnector> ConItems { get; set; } = new AvaloniaList<TestConnector>
+    {
+        new TestConnector
         {
-            var tester = this.FindControl<DAGlynEditor>("EditorTester");
-            if (tester != null)
-            {
-                tester.ViewportLocation = new Point(100, 200);
-            }
-        }*/
+            Location = new Point(0, 0),
+            /*W = 100,
+            H = 100,
+            Br = Brushes.Red,*/
+            ConType = ConnectorType.OutConnector
+        },
+        new TestConnector
+        {
+            Location = new Point(200, 200),
+            /*W = 150,
+            H = 150,
+            Br = Brushes.Blue,*/
+            ConType = ConnectorType.InConnector
+        }
+    };
     }
 
-    public class MyRectInfo
+    public enum ConnectorType
+    {
+        InConnector,
+        OutConnector
+    }
+
+    public class TestConnector
     {
         public Point Location { get; set; }
         public double W { get; set; }
         public double H { get; set; }
-        public IImmutableSolidColorBrush Br { get; set; }
+        //public IImmutableSolidColorBrush Br { get; set; }
+
+        public ConnectorType ConType { get; set; }
+
+
     }
 }

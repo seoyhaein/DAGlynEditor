@@ -4,43 +4,34 @@ using Avalonia.Interactivity;
 
 namespace DAGlynEditor
 {
-    public delegate void PendingConnectionEventHandler(object? sender, PendingConnectionEventArgs e);
-
     // 클래스 설명을 추가 필요
     public class PendingConnectionEventArgs : RoutedEventArgs
     {
-        // 기본 생성자에 대한 설명을 추가 필요
-        public PendingConnectionEventArgs()
+        public PendingConnectionEventArgs(RoutedEvent routedEvent, Connector? sourceConnector)
+            : base(routedEvent)
         {
+            SourceConnector = sourceConnector;
         }
 
-        // DataContext를 설정하는 생성자에 대한 설명 추가 필요
-        public PendingConnectionEventArgs(object? dataContext)
+        public PendingConnectionEventArgs(RoutedEvent routedEvent, Connector? sourceConnector, Point? anchor)
+            : base(routedEvent)
         {
-            SourceConnectorDataContext = dataContext;
-        }
-        
-        public PendingConnectionEventArgs(RoutedEvent routedEvent, object? source, object? dataContext)
-            : base(routedEvent, source ?? throw new ArgumentNullException(nameof(source)))
-        {
-            SourceConnectorDataContext = dataContext;
+            SourceConnector = sourceConnector;
+            Anchor = anchor;
         }
 
-        // 각 속성에 대한 설명을 추가
-        public Point Anchor { get; set; } = new Point(); // 기본값 설정
+        // TODO 여기서 Connector? sourceConnector 는 필요없을 듯한데 일단 남겨둔다.
+        public PendingConnectionEventArgs(RoutedEvent routedEvent, Connector? sourceConnector, Vector? offset)
+            : base(routedEvent)
+        {
+            SourceConnector = sourceConnector;
+            Offset = offset;
+        }
 
-        public object? SourceConnectorDataContext { get; }
-
-        public object? TargetConnectorDataContext { get; set; }
-
-        public double OffsetX { get; set; }
-
-        public double OffsetY { get; set; }
-
-        public bool Canceled { get; set; }
-
-        public object? Sender { get; set; }
-        
-        public object? CapturedObject { get; set; }
+        public Connector? SourceConnector { get; set; }
+        // 시작점
+        public Point? Anchor { get; set; }
+        // 이동 거리
+        public Vector? Offset { get; set; }
     }
 }

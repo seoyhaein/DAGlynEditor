@@ -2,12 +2,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:DAGlynEditor"
         x:CompileBindings="True">
-	
+
 	<Design.PreviewWith>
-		<controls:Node />
+		<Border Padding="20">
+			<controls:Node />
+		</Border>
 	</Design.PreviewWith>
 
-
+	<!-- Add Styles Here -->
 	<Style Selector="controls|Node">
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -39,7 +41,7 @@
                             </StackPanel>-->
 
 							<!-- 오른쪽 구획 -->
-							<Rectangle Grid.Column="2" Fill="#2e2e2e"/>
+							<controls:OutConnector Grid.Column="2" Fill="#2e2e2e"/>
 							<!--<StackPanel Grid.Column="2">
                                 <TextBlock Text="Right Node" Foreground="WhiteSmoke" Margin="5"/>
                                 ~1~ 오른쪽 포트들을 추가할 수 있음 @1@

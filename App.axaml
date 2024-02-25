@@ -11,5 +11,6 @@
 		<StyleInclude Source="/Themes/Styles/Node.axaml" />
 		<StyleInclude Source="/Themes/Styles/Connector.axaml"/>
 		<StyleInclude Source="/Themes/Styles/ItemContainer.axaml"/>
+        <StyleInclude Source="/Themes/Styles/PendingConnection.axaml"/>
     </Application.Styles>
 </Application>

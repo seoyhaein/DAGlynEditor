@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
@@ -7,17 +6,17 @@ using System;
 
 namespace DAGlynEditor
 {
-    public class PendingConnection : ContentControl, IDisposable
+    public sealed class PendingConnection : ContentControl, IDisposable
     {
         #region Dependency Properties
-
+        // TODO 이름 수정한다.
         // 연결의 시작점
         public static readonly StyledProperty<Point> SourceAnchorProperty =
-            AvaloniaProperty.Register<PendingConnection, Point>(nameof(SourceAnchor), default(Point));
+            AvaloniaProperty.Register<PendingConnection, Point>(nameof(SourceAnchor));
 
         // 연결의 끝점
         public static readonly StyledProperty<Point> TargetAnchorProperty =
-            AvaloniaProperty.Register<PendingConnection, Point>(nameof(TargetAnchor), default(Point));
+            AvaloniaProperty.Register<PendingConnection, Point>(nameof(TargetAnchor));
 
         // 연결 시작의 Connector
         public static readonly StyledProperty<object?> SourceConnectorProperty =
@@ -29,7 +28,7 @@ namespace DAGlynEditor
 
         // 미리보기 활성화 여부 정의
         public static readonly StyledProperty<bool> EnablePreviewProperty =
-            AvaloniaProperty.Register<PendingConnection, bool>(nameof(EnablePreview), false);
+            AvaloniaProperty.Register<PendingConnection, bool>(nameof(EnablePreview));
 
         // 미리보기 대상 객체 정의
         public static readonly StyledProperty<object?> PreviewTargetProperty =
@@ -40,19 +39,9 @@ namespace DAGlynEditor
         public static readonly StyledProperty<double> StrokeThicknessProperty =
             Shape.StrokeThicknessProperty.AddOwner<PendingConnection>();
 
-
-        // 커넥터만 허용 여부 정의.
-        // TODO 확인한다.
-        /*public static readonly DependencyProperty AllowOnlyConnectorsProperty =
-            DependencyProperty.Register(nameof(AllowOnlyConnectors), typeof(bool), typeof(PendingConnection),
-                new FrameworkPropertyMetadata(BoxValue.True, OnAllowOnlyConnectorsChanged));*/
-
-        public static readonly StyledProperty<bool> AllowOnlyConnectorsProperty =
-            AvaloniaProperty.Register<PendingConnection, bool>(nameof(AllowOnlyConnectors), true);
-
         // 스냅핑 활성화 여부 정의
         public static readonly StyledProperty<bool> EnableSnappingProperty =
-            AvaloniaProperty.Register<PendingConnection, bool>(nameof(EnableSnapping), false);
+            AvaloniaProperty.Register<PendingConnection, bool>(nameof(EnableSnapping));
 
         // 연결 방향 정의.
         public static readonly StyledProperty<ConnectionDirection> DirectionProperty =
@@ -62,15 +51,10 @@ namespace DAGlynEditor
         public static readonly StyledProperty<IBrush?> SetFillAndStrokeProperty =
             AvaloniaProperty.Register<PendingConnection, IBrush?>(nameof(SetFillAndStroke), defaultValue: null);
 
-        #endregion
-
-        #region Properties
-
         public Point SourceAnchor
         {
             get => GetValue(SourceAnchorProperty);
             set => SetValue(SourceAnchorProperty, value);
-
         }
 
         public Point TargetAnchor
@@ -109,12 +93,6 @@ namespace DAGlynEditor
             set => SetValue(EnableSnappingProperty, value);
         }
 
-        public bool AllowOnlyConnectors
-        {
-            get => GetValue(AllowOnlyConnectorsProperty);
-            set => SetValue(AllowOnlyConnectorsProperty, value);
-        }
-
         public double StrokeThickness
         {
             get => GetValue(StrokeThicknessProperty);
@@ -136,41 +114,40 @@ namespace DAGlynEditor
         #endregion
 
         #region Fields
-
-        private IDisposable? _fillAndStrokeSubscription;
+        // TODO 생각하기 readonly 가 필요할까?
+        private readonly IDisposable _disposable;
 
         #endregion
 
+        #region Constructors
+
         public PendingConnection()
         {
-            // TODO 어떤 것이 더 나은지 살펴보자.
-            // GetPropertyChangedObservable(AllowOnlyConnectorsProperty).Subscribe(OnAllowOnlyConnectorsChanged);
-            AllowOnlyConnectorsProperty.Changed.Subscribe(OnAllowOnlyConnectorsChanged);
-
-            _fillAndStrokeSubscription = SetFillAndStrokeProperty.Changed.Subscribe(value =>
-            {
-                if (value.Sender is Connection connection)
-                {
-                    var brush = value.GetNewValue<IBrush?>(); // value.NewValue 대신 GetNewValue<IBrush?>() 사용
-                    connection.Fill = brush;
-                    connection.Stroke = brush;
-                }
-            });
-
-            // TODO axaml 에서 생성한 경우 Dispose 할 수 없는데 이렇게 하면 될까?
-            this.Unloaded += (sender, e) => this.Dispose();
+            _disposable = SetFillAndStrokeProperty.Changed.Subscribe(SetFillAndStrokePropertyChanged);
+            // TODO axaml 에서 사용시 Dispose 하는 방법에 대해서 생각해보기.
+            this.Unloaded += (_, _) => this.Dispose();
         }
 
-        private static void OnAllowOnlyConnectorsChanged(AvaloniaPropertyChangedEventArgs e)
+        #endregion
+
+        #region Methods
+
+        private void SetFillAndStrokePropertyChanged(AvaloniaPropertyChangedEventArgs value)
         {
-            // 속성이 변경될 때 실행할 코드
-            Debug.WriteLine("Hello world");
+            if (value.Sender is Connection connection)
+            {
+                var brush = value.GetNewValue<IBrush?>(); // value.NewValue 대신 GetNewValue<IBrush?>() 사용
+                connection.Fill = brush;
+                connection.Stroke = brush;
+            }
         }
 
-        // TODO axaml 에서 사용시 Dispose 하는 방법에 대해서 생각해보기.
         public void Dispose()
         {
-            _fillAndStrokeSubscription?.Dispose();
+            // 관리되는 자원 해제
+            _disposable.Dispose();
         }
+
+        #endregion
     }
 }

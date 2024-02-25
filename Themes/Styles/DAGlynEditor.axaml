@@ -4,33 +4,49 @@
 	<Design.PreviewWith>
 		<Border Padding="20">
 			<!-- Add Controls for Previewer Here -->
-		    <controls:DAGlynEditor />
+			<controls:DAGlynEditor />
 		</Border>
 	</Design.PreviewWith>
 
 	<!-- Add Styles Here -->
 	<Style Selector="controls|DAGlynEditor">
-        <Setter Property="BorderBrush"
+		<Setter Property="BorderBrush"
                 Value="DodgerBlue" />
-        <Setter Property="Background"
-                Value="Green" />
-        <Setter Property="BorderThickness"
+		<Setter Property="Background"
+                Value="Transparent" />
+		<Setter Property="BorderThickness"
                 Value="2"/>
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Border Background="{TemplateBinding Background}"
+		<Setter Property="PendingConnectionTemplate">
+			<DataTemplate>
+				<!-- RelativeSource 사용하는 것보다 성능상 이득이 있을 듯하다.-->
+				<controls:PendingConnection SourceAnchor="{Binding $parent[controls:DAGlynEditor].SourceAnchor}"
+                                            TargetAnchor="{Binding $parent[controls:DAGlynEditor].TargetAnchor}"
+                                            IsVisible="{Binding $parent[controls:DAGlynEditor].IsVisiblePendingConnection}" />
+			</DataTemplate>
+		</Setter>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}" >
-                    <ItemsPresenter x:Name="PART_ItemsPresenter">
-                        <ItemsPresenter.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <controls:DAGlynEditorCanvas x:Name="PART_ItemsHost" Background="Transparent"  
-                                                             ViewportLocation="{TemplateBinding ViewportLocation}"/>
-                            </ItemsPanelTemplate>
-                        </ItemsPresenter.ItemsPanel>
-                    </ItemsPresenter>
-                </Border>
-            </ControlTemplate >
-        </Setter>
-    </Style>
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="10">
+					<Canvas x:Name="PART_TopLayer">
+						<ItemsPresenter x:Name="PART_ItemsPresenter">
+							<ItemsPresenter.ItemsPanel>
+								<ItemsPanelTemplate>
+									<controls:DAGlynEditorCanvas x:Name="PART_ItemsHost"
+																 ViewportLocation="{TemplateBinding ViewportLocation}"/>
+								</ItemsPanelTemplate>
+							</ItemsPresenter.ItemsPanel>
+						</ItemsPresenter>
+						<!-- TODO -->
+						<!-- 여기서 Content 를 PendingConnection 으로 바인딩하게 하였지만 사실 이건 사용하지 않을 예정이다. 
+                        외부확장을 위해서 넣어두었는데, 일단 구현 후 삭제할 예정임. -->
+						<ContentPresenter ContentTemplate="{TemplateBinding PendingConnectionTemplate}"
+                                          Content="{TemplateBinding PendingConnection}" />
+					</Canvas>
+				</Border>
+			</ControlTemplate >
+		</Setter>
+	</Style>
 </Styles>

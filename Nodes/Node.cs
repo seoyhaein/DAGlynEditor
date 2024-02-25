@@ -1,222 +1,184 @@
 ﻿using System;
-using Avalonia;
-using Avalonia.Media;
-using Avalonia.Controls.Primitives;
-using Avalonia.Markup.Xaml.Templates;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Layout;
+using Avalonia.Media;
 
 namespace DAGlynEditor
 {
-    // 일단 바로 Node 를 집어넣기 위해서 ICanvasItem 를 상속받는 것으로 수정함. ItemContainer 는 이것이 필요 없을 것 같기도 하다.이건 생각해보자.
-    public class Node : TemplatedControl, ICanvasItem
+    /*
+  * 새롭게 Reload 할 경우 위치에 대한 변경을 해줘야 한다.
+  * Location 이 최종적으로 변할때 이것을 기록하고 UI 변경사항을 남겨야 한다.
+  * InValid~~ Transform 은 시각적인 위치만 변경시킨다. 다시 reload 할 경우 원래대로 돌아온다.
+  */
+
+    /// <summary>
+    /// 속성 변경에 따른 메서드로 처리하는게 나을지 고민해야함. DAGlynEditorCanvas 와 비교해봐야 함.
+    /// 중복되는 기능들은 통합할 필요 있음.
+    /// </summary>
+
+    public class Node : BaseNode
     {
-        private readonly CompositeDisposable _disposables = new CompositeDisposable();
-        
-        #region Constructors
+        #region Dependency Properties
 
-        public Node() { }
+        public static readonly StyledProperty<Control?> ParentControlProperty =
+            AvaloniaProperty.Register<BaseNode, Control?>(nameof(ParentControl));
 
-        public Node(Point? location)
+        public Control? ParentControl
         {
-            if (location == null)
-                throw new ArgumentNullException(nameof(location), "Location cannot be null.");
-            
-            this.Location = (Point)location; 
+            get => GetValue(ParentControlProperty);
+            set => SetValue(ParentControlProperty, value);
         }
+        #endregion
 
-        // TODO Reactive 방식 추후 적용할지 고민해보자.
-        /*static Node()
-        {
-            //FooterProperty.Changed.Subscribe(OnFooterChanged);
-        }*/
+        #region fields
+
+        // Node 의 움직임을 위해
+        private TranslateTransform _translateTransform = new TranslateTransform();
+        private readonly IDisposable _disposable;
 
         #endregion
-        
-        private void InitializeSubscriptions()
-        {
-            Observable.FromEventPattern<PointerPressedEventArgs>(
-                    h => this.PointerPressed += h,
-                    h => this.PointerPressed -= h)
-                .Subscribe(args => HandlePointerPressed(args.EventArgs))
-                .DisposeWith(_disposables);
 
-            Observable.FromEventPattern<PointerEventArgs>(
-                    h => this.PointerMoved += h,
-                    h => this.PointerMoved -= h)
-                .Subscribe(args => HandlePointerMoved(args.EventArgs))
-                .DisposeWith(_disposables);
+        //TODO Node 삭제되는 것도 신경써야 한다.
+        #region Constructor
 
-            Observable.FromEventPattern<PointerReleasedEventArgs>(
-                    h => this.PointerReleased += h,
-                    h => this.PointerReleased -= h)
-                .Subscribe(args => HandlePointerReleased(args.EventArgs))
-                .DisposeWith(_disposables);
-        }
-        
-        private void HandlePointerPressed(PointerPressedEventArgs args)
+        public Node()
         {
-            Debug.WriteLine("pressed called");
+            // 초기 설정에서 TranslateTransform 객체를 RenderTransform으로 설정
+            this.RenderTransform = _translateTransform;
+            //TODO 살펴보자. dispose
+            _disposable = ParentControlProperty.Changed.Subscribe(HandleParentControlChanged);
         }
 
-        private void HandlePointerMoved(PointerEventArgs args)
+        public Node(Point location) : this()
         {
-            Debug.WriteLine("moved called");
+            this.Location = location;
         }
 
-        private void HandlePointerReleased(PointerReleasedEventArgs args)
+        #endregion
+
+        #region Evnet Handlers
+
+        protected override void HandlePointerPressed(object? sender, PointerPressedEventArgs args)
         {
-            Debug.WriteLine("released called");
+            if (this.ParentControl == null)
+                throw new InvalidOperationException("Node cannot move because a DAGlynEditorCanvas parent is not found.");
+
+            // 불필요한 조건 검사 제거
+            if (args.GetCurrentPoint(this).Properties.IsLeftButtonPressed && sender != null)
+            {
+                Focus();
+                args.Pointer.Capture(this);
+                Debug.Print("Dragging Start");
+
+                InitialPointerPosition = args.GetPosition(ParentControl);
+                PreviousPointerPosition = InitialPointerPosition;
+                this.IsDragging = true;
+                args.Handled = true;
+            }
         }
 
-        #region Dependency Properties
-        
-        public static readonly StyledProperty<Point> LocationProperty =
-            AvaloniaProperty.Register<ItemContainer, Point>(nameof(Location));
-
-        public Point Location
+        protected override void HandlePointerMoved(object? sender, PointerEventArgs args)
         {
-            get => GetValue(LocationProperty);
-            set => SetValue(LocationProperty, value);
-        }
-        
-        /*
-            protected internal static readonly DependencyPropertyKey HasFooterPropertyKey = DependencyProperty.RegisterReadOnly(nameof(HasFooter), typeof(bool), typeof(Node), new FrameworkPropertyMetadata(BoxValue.False));
-            public static readonly DependencyProperty HasFooterProperty = HasFooterPropertyKey.DependencyProperty;
-         */
-        // Brush 를 사용할 때 Media 가 적절한지는 좀더 살펴보자.
-        public static readonly StyledProperty<IBrush?> ContentBrushProperty =
-                AvaloniaProperty.Register<Node, IBrush?>(nameof(ContentBrush));
+            if (this.ParentControl == null)
+                throw new InvalidOperationException("Node cannot move because a DAGlynEditorCanvas parent is not found.");
 
-        public IBrush? ContentBrush
-        {
-            get => GetValue(ContentBrushProperty);
-            set => SetValue(ContentBrushProperty, value);
+            if (sender == null || !this.IsDragging || !this.Equals(args.Pointer.Captured)) return;
+
+            Debug.Print("Dragging...");
+            CurrentPointerPosition = args.GetPosition(ParentControl);
+            var delta = CurrentPointerPosition - PreviousPointerPosition;
+
+            // 드래그 임계값 검사
+            if (((Vector)delta).SquaredLength > Constants.AppliedThreshold)
+            {
+                NodeMove(this.Location + delta); // SetLocation 메소드를 통한 위치 업데이트
+                PreviousPointerPosition = CurrentPointerPosition;
+                args.Handled = true;
+            }
         }
 
-        public static readonly StyledProperty<IBrush?> HeaderBrushProperty =
-                AvaloniaProperty.Register<Node, IBrush?>(nameof(HeaderBrush));
-
-        public IBrush? HeaderBrush
+        protected override void HandlePointerReleased(object? sender, PointerReleasedEventArgs args)
         {
-            get => GetValue(HeaderBrushProperty);
-            set => SetValue(HeaderBrushProperty, value);
+            if (this.ParentControl == null)
+                throw new InvalidOperationException("Node cannot move because a DAGlynEditorCanvas parent is not found.");
+
+            if (sender != null && this.Equals(args.Pointer.Captured) && this.IsDragging)
+            {
+                Debug.Print("Finish");
+                args.Pointer.Capture(null);
+                this.IsDragging = false;
+                args.Handled = true;
+            }
         }
 
-        public static readonly StyledProperty<IBrush?> FooterBrushProperty =
-                AvaloniaProperty.Register<Node, IBrush?>(nameof(FooterBrush));
-
-        public IBrush? FooterBrush
+        private void HandleParentControlChanged(AvaloniaPropertyChangedEventArgs e)
         {
-            get => GetValue(FooterBrushProperty);
-            set => SetValue(FooterBrushProperty, value);
-        }
-
-        public static readonly StyledProperty<DataTemplate> HeaderTemplateProperty =
-                AvaloniaProperty.Register<Node, DataTemplate>(nameof(HeaderTemplate));
-
-        public DataTemplate HeaderTemplate
-        {
-            get => GetValue(HeaderTemplateProperty);
-            set => SetValue(HeaderTemplateProperty, value);
-        }
-
-        public static readonly StyledProperty<object> HeaderProperty =
-            AvaloniaProperty.Register<Node, object>(nameof(Header));
-        public object Header
-        {
-            get => GetValue(HeaderProperty);
-            set => SetValue(HeaderProperty, value);
-        }
-
-        // default method 잡아줘야함.
-        public static readonly StyledProperty<DataTemplate> FooterTemplateProperty =
-            AvaloniaProperty.Register<Node, DataTemplate>(nameof(FooterTemplate));
-
-        public DataTemplate FooterTemplate
-        {
-            get => GetValue(FooterTemplateProperty);
-            set => SetValue(FooterTemplateProperty, value);
-        }
-
-        public static readonly StyledProperty<object> FooterProperty =
-            AvaloniaProperty.Register<Node, object>(nameof(Footer));
-        public object Footer
-        {
-            get => GetValue(FooterProperty);
-            set => SetValue(FooterProperty, value);
-        }
-        public static readonly StyledProperty<DataTemplate> InputConnectorTemplateProperty =
-            AvaloniaProperty.Register<Node, DataTemplate>(nameof(InputConnectorTemplate));
-        public DataTemplate InputConnectorTemplate
-        {
-            get => GetValue(InputConnectorTemplateProperty);
-            set => SetValue(InputConnectorTemplateProperty, value);
-        }
-
-        public static readonly StyledProperty<DataTemplate> OutputConnectorTemplateProperty =
-            AvaloniaProperty.Register<Node, DataTemplate>(nameof(OutputConnectorTemplate));
-        public DataTemplate OutputConnectorTemplate
-        {
-            get => GetValue(InputConnectorTemplateProperty);
-            set => SetValue(InputConnectorTemplateProperty, value);
-        }
-        // TODO 여기에서 테스트 용으로 default 값을 넣었지만, 향후 삭제할 예정임.
-        public static readonly StyledProperty<IEnumerable> InputProperty =
-            AvaloniaProperty.Register<Node, IEnumerable>(nameof(Input), defaultValue: new List<string> { "DefaultItem" });
-        public IEnumerable Input
-        {
-            get => GetValue(InputProperty);
-            set => SetValue(InputProperty, value);
-        }
-        // TODO 여기에서 테스트 용으로 default 값을 넣었지만, 향후 삭제할 예정임.
-        public static readonly StyledProperty<IEnumerable> OutputProperty =
-            AvaloniaProperty.Register<Node, IEnumerable>(nameof(Output), defaultValue: new List<string> { "DefaultItem" });
-        public IEnumerable Output
-        {
-            get => GetValue(OutputProperty);
-            set => SetValue(OutputProperty, value);
-        }
-
-        public static readonly StyledProperty<VerticalAlignment> VerticalContentAlignmentProperty =
-            AvaloniaProperty.Register<Node, VerticalAlignment>(nameof(VerticalContentAlignment), defaultValue: VerticalAlignment.Stretch);
-
-        public VerticalAlignment VerticalContentAlignment
-        {
-            get => GetValue(VerticalContentAlignmentProperty);
-            set => SetValue(VerticalContentAlignmentProperty, value);
-        }
-
-        public static readonly StyledProperty<HorizontalAlignment> HorizontalContentAlignmentProperty =
-            AvaloniaProperty.Register<Node, HorizontalAlignment>(nameof(HorizontalContentAlignment), defaultValue: HorizontalAlignment.Stretch);
-
-        public HorizontalAlignment HorizontalContentAlignment
-        {
-            get => GetValue(HorizontalContentAlignmentProperty);
-            set => SetValue(HorizontalContentAlignmentProperty, value);
+            if (e.NewValue is DAGlynEditorCanvas editorCanvas)
+            {
+                this.ParentControl = editorCanvas;
+            }
+            else
+            {
+                var parentControl = this.GetParentVisualOfType<DAGlynEditorCanvas>();
+                if (parentControl != null)
+                {
+                    this.ParentControl = parentControl;
+                }
+                else
+                {
+                    this.ParentControl = null;
+                }
+            }
         }
 
         #endregion
 
         #region Methods
 
-        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        private void NodeMove(Point point)
         {
-            base.OnPropertyChanged(change);
-            switch (change.Property.Name)
-            {
-                case nameof(HeaderProperty):
-                case nameof(FooterProperty):
-                    break;
-            }
+            Location = point;
+            _translateTransform.X = point.X;
+            _translateTransform.Y = point.Y;
         }
 
         #endregion
-        
+
+        /// <inheritdoc />
+        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+        {
+            base.OnApplyTemplate(e);
+            this.ParentControl = this.GetParentVisualOfType<DAGlynEditorCanvas>();
+        }
+
+        public bool CanNodeMove()
+        {
+            var parentControl = this.GetParentVisualOfType<DAGlynEditorCanvas>();
+            if (parentControl != null)
+            {
+                this.ParentControl = parentControl;
+                return true;
+            }
+            else
+            {
+                this.ParentControl = null;
+                return false;
+            }
+        }
+
+        public void SetLocation(Point location)
+        {
+            this.Location = location;
+        }
+
+        // TODO 살펴보자.
+        protected override void Dispose(bool disposing)
+        {
+            _disposable.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }
