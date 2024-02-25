@@ -61,8 +61,8 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~- 좌표 체계가 혼동스러움. 일단 이거 정리하자.~~
 ~~- Connector 구현 하기~~  
 - 새로운 UI 구현.  
-- Connector 테스트 하기, Dispose 관련해서 테스트 진행하기.  
-- Connector 구현 후 PendingConnection 완성.  
+~~- Connector 테스트 하기, Dispose 관련해서 테스트 진행하기.~~    
+~~- Connector 구현 후 PendingConnection 완성.~~    
 ~~- Node UI 초기 설계, Node 이동 구현 필요.(NodeEditor 확인)~~  
 - Node 이동 시 최종적인 위치 변경은 위치 변경 후 Invallid~ 호출 그리고 데이터 저장해야 함. 이 구현은 거의 마지막에 이루어 질듯.   
 ~~- Panning 구현 다시 정리하기.(DAGlynEditor 구현 및 정리)~~   
@@ -99,9 +99,9 @@ It's optimized for intuitive node-based GUI interactions, providing an efficient
 ~~2. EditorCanvas 의 사이즈 설정에 대한 부분 고민해야힘.(최우선을 해결 필요)~~    
 ~~- 이건 각 모니터 사이즈에 따라 달리 설정하는 설정의 문제인 거 같다. 좀 생각을 단단히 해야 할 것 같다.~~    
 3. Connection.cs 에서 SourceOffset, TargetOffset 관련 값의 설정에 대한 제한을 걸어야 함.  
-4. Location 에 대한 생각 및 구현을 구체화 해야 함. (PendingConnection 추가 및 완성 해야함. Connector 와 연관됨.)  
+~~4. Location 에 대한 생각 및 구현을 구체화 해야 함. (PendingConnection 추가 및 완성 해야함. Connector 와 연관됨.)~~    
 ~~5. Connector 를 일단 원형으로 구현하고 있는데, 향후 직사학형 형태로 제작하고 Input/Output 을 각각 색상을 조정할 예정임.~~    
-6. 리소스 통합하기 (PendingConnection.axaml 아직 추가 안됨.)
+6. 리소스 통합하기 ~~(PendingConnection.axaml 아직 추가 안됨.)~~  
 7. 업데이트 꼭 확인하기. 놓친거 있음. (부분적으로 업데이트 했는데 완전히 동일하게 할지 고민중)  
 
 ## 추가된 libs (Reactive 버전 잘 살펴야함.)
